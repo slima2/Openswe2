@@ -253,17 +253,42 @@ export async function initializeSandbox(
 
   emitStepEvent(baseCreateSandboxAction, "pending");
   let sandbox: Sandbox;
-  try {
-    sandbox = await daytonaClient().create(DEFAULT_SANDBOX_CREATE_PARAMS);
-    emitStepEvent(baseCreateSandboxAction, "success");
-  } catch (e) {
-    logger.error("Failed to create sandbox environment", { e });
-    emitStepEvent(
-      baseCreateSandboxAction,
-      "error",
-      "Failed to create sandbox environment. Please try again later.",
+  
+  // Check if we should use local mode (Windows or env variable set)
+  const shouldUseLocalMode = process.platform === 'win32' || process.env.OPEN_SWE_LOCAL_MODE === "true";
+  
+  if (shouldUseLocalMode) {
+    // In Windows or when local mode is enabled, skip Daytona sandbox creation
+    logger.info("Using local mode instead of Daytona sandbox (Windows detected or local mode enabled)");
+    
+    // Create a mock sandbox object with minimal required properties
+    sandbox = {
+      id: `local-sandbox-${Date.now()}`,
+      state: "started",
+    } as any;
+    
+    emitStepEvent(baseCreateSandboxAction, "skipped", "Using local mode instead of Daytona");
+    
+    // Jump to local mode initialization
+    return initializeSandboxLocal(
+      state,
+      config,
+      emitStepEvent,
+      createEventsMessage,
     );
-    throw new Error("Failed to create sandbox environment.");
+  } else {
+    try {
+      sandbox = await daytonaClient().create(DEFAULT_SANDBOX_CREATE_PARAMS);
+      emitStepEvent(baseCreateSandboxAction, "success");
+    } catch (e) {
+      logger.error("Failed to create sandbox environment", { e });
+      emitStepEvent(
+        baseCreateSandboxAction,
+        "error",
+        "Failed to create sandbox environment. Please try again later.",
+      );
+      throw new Error("Failed to create sandbox environment.");
+    }
   }
 
   // Cloning repository
