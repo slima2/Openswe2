@@ -148,8 +148,8 @@ async function startProgrammerRun(input: {
     },
   );
 
-  // Skip GitHub operations in local mode
-  if (!isLocalMode(config)) {
+  // MODIFIED: Skip GitHub operations in local mode or when no issue ID
+  if (!isLocalMode(config) && state.githubIssueId && state.githubIssueId !== 0) {
     await addTaskPlanToIssue(
       {
         githubIssueId: state.githubIssueId,

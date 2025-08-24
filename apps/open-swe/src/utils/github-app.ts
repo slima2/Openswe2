@@ -13,6 +13,9 @@ export class GitHubApp {
       ? replaceNewlinesWithBackslashN(process.env.GITHUB_APP_PRIVATE_KEY)
       : undefined;
     const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
+    console.log("appId", appId);
+    console.log("privateKey", privateKey);
+    console.log("webhookSecret", webhookSecret);
     if (!appId || !privateKey || !webhookSecret) {
       throw new Error(
         "GitHub App ID, Private Key, or Webhook Secret is not configured.",

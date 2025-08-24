@@ -1,0 +1,80 @@
+===================================================
+CONFIGURACIÓN URGENTE DE OPEN SWE
+===================================================
+
+PASO 1: Ve a https://github.com/settings/apps y encuentra tu app "OpenSWE2"
+PASO 2: Copia estos valores de tu GitHub App:
+
+1. APP ID: ___________________ (número)
+2. CLIENT ID: Iv1._________________ 
+3. CLIENT SECRET: _________________ (genéralo y cópialo YA)
+4. PRIVATE KEY: Descarga el archivo .pem y ábrelo con Notepad
+
+===================================================
+ARCHIVO 1: apps\open-swe\.env
+===================================================
+Copia y pega todo esto, reemplazando los valores:
+
+# LangSmith (opcional por ahora, déjalo vacío)
+LANGCHAIN_PROJECT="default"
+LANGCHAIN_API_KEY=""
+LANGCHAIN_TRACING_V2="false"
+
+# LLM Provider (opcional por ahora, déjalo vacío)  
+ANTHROPIC_API_KEY=""
+OPENAI_API_KEY=""
+
+# Infrastructure (opcional por ahora, déjalo vacío)
+DAYTONA_API_KEY=""
+
+# GitHub App (PON TUS VALORES REALES AQUÍ)
+GITHUB_APP_NAME="OpenSWE2"
+GITHUB_APP_ID="PON_TU_APP_ID_AQUI"
+GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----
+PEGA_TODO_EL_CONTENIDO_DE_TU_ARCHIVO_PEM_AQUI
+INCLUYENDO_TODAS_LAS_LINEAS
+-----END RSA PRIVATE KEY-----"
+GITHUB_WEBHOOK_SECRET="dummy-webhook-for-local-dev"
+
+# Server config
+PORT="2024"
+OPEN_SWE_APP_URL="http://localhost:3000"
+SECRETS_ENCRYPTION_KEY="8B6D8A9548531924EC59BA36DF9EA9FE8465C8E23E3C581A2E30CC05014B14A3"
+SKIP_CI_UNTIL_LAST_COMMIT="true"
+
+===================================================
+ARCHIVO 2: apps\web\.env  
+===================================================
+Copia y pega todo esto, reemplazando los valores:
+
+# API URLs
+NEXT_PUBLIC_API_URL="http://localhost:3000/api"
+LANGGRAPH_API_URL="http://localhost:2024"
+
+# Encryption
+SECRETS_ENCRYPTION_KEY="8B6D8A9548531924EC59BA36DF9EA9FE8465C8E23E3C581A2E30CC05014B14A3"
+
+# GitHub OAuth (PON TUS VALORES REALES AQUÍ)
+NEXT_PUBLIC_GITHUB_APP_CLIENT_ID="PON_TU_CLIENT_ID_AQUI"
+GITHUB_APP_CLIENT_SECRET="PON_TU_CLIENT_SECRET_AQUI"
+GITHUB_APP_REDIRECT_URI="http://localhost:3000/api/auth/github/callback"
+
+# GitHub App (MISMOS VALORES QUE ARRIBA)
+GITHUB_APP_NAME="OpenSWE2"
+GITHUB_APP_ID="PON_TU_APP_ID_AQUI"
+GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----
+PEGA_TODO_EL_CONTENIDO_DE_TU_ARCHIVO_PEM_AQUI
+INCLUYENDO_TODAS_LAS_LINEAS
+-----END RSA PRIVATE KEY-----"
+GITHUB_WEBHOOK_SECRET="dummy-webhook-for-local-dev"
+
+===================================================
+DESPUÉS DE CONFIGURAR:
+===================================================
+1. Guarda ambos archivos .env
+2. DETÉN los servidores (Ctrl+C en ambas ventanas)
+3. Reinicia los servidores:
+   Terminal 1: cd apps\open-swe && node ..\..\yarn.js dev
+   Terminal 2: cd apps\web && node ..\..\yarn.js dev
+4. Ve a http://localhost:3000
+5. Ahora sí podrás hacer login con GitHub!

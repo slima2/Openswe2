@@ -1,0 +1,55 @@
+ACTUALIZACIÓN URGENTE DE ARCHIVOS .ENV
+=======================================
+
+COPIA ESTE PRIVATE KEY EXACTO EN AMBOS ARCHIVOS:
+
+GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAq3UV7bTGHzQRcUe20wC3J80xcnqTr9p7KOwmBjlBBPgwGjN2
+reIE+nRhij/G6Iyn+pUFGC/pHzY4Mz9+fA3ckRldRA1lm7fy/zudejggter6nrXo
+GImuP1SIg8gmdxbBKKwE1D0DZprQiZOGdBZfOvxJE58a4jfq7TerZzpaTd4nzPqU
+QB/yRxFngPT5Bn1FHi0eaRu4g2mD5h+chh0zAbJQooSy3z4Nw0pWT/uoSjHALkaG
+gpVwTF1A2ScWUnVZ5eLT5vnQERxzXwNmdgaaj86vNPivpk6Cw+CYDy/uD2NZEiDM
+kgzzyxk2RGlzBY2tr5x9WuwT18dwpJmkJAUWqwIDAQABAoIBAE9AQQENSHB+3Dsc
+t1RjpcUnct4j62Ti23+oW9EPoM6fu3g45nfsG3n61mUVIqc18KUCQYcTCjHLmYGS
+rS/BJn0JGNOOT7OA/LheAWXPUMtVkD9Q/LVu2lRaiflDyAfOxDy8+kRx6UMBdzfI
+MWMyPhVhLJP9vGrpBtVcIIWH8tq/fGXrNGCbACBwFGhpJq2JaiqwwCj78l56zIwT
+d0jz1C9KJOel/jf+ZQMAP4bClty+nvAQ78Pdv5HcroJEzM3k+6dSTT37klIKFzmY
+DMwBVXNnuKK74dF65q3pwP+X0EXVouGQdD7v41veFuIon0ZZRjJyNVQwxtj56wwl
+WBtw0C0CgYEA67wq6Lirj7tbtJIt8Vk9U58B/yFVGITa5/DhITH17OHQgdgMHXPF
+q147IZnf5BTt2chjS7gS6mBZLutmpsp8MPvkzQF9yXXXCF9e/WWq8hXyoi0nGf7O
+T/eEFizsHxOFn3YqQvYSgkcBCFIRk9ly8HZn52cvYKTdsr7qSri4Cx8CgYEAujJb
+ONn8zV7N0KRe5ZRyDBdJN5zkjzc03UBAEDFSaRsvTjHbPsj+7W0de8ieh+3O+KaD
+U1wOVgInvQFz08qaLekCFTW8dAQBHpaAdgb0jHE2etRoQpdZY/AVgwR/OmtbGe9/
+aiw3vnfS+hOx3/M0MWey9FqpAThS2aDfxnahTvUCgYEAgQFr1gnh0Xmt+QaaX97/
+Ybi95fo+0Hk8Nvwqp/joZac6bSRnlOKbhWm/IGdOEEqn06wHMxPcPilWBQhMF/Dt
+v/zJvKsZRFvZvro6iJ/PykXaj4f4QxCfpUGGJoCVA3iygo6vGBAEFwl2djA7cFbq
+wM97kzZzxgbTUJOMMjIefe8CgYEAqGZs3LFDFFdfHAndjhRBRbA11yd+DA1pMYYv
+qrWBDHC6yyUKXvGYpxHd7ZtXziaF35tyAQ2sJZvTZv0OTgnaghVQffBY3jDU9l42
+FwlZWj/2fwbmuPt7rIhyXEnP6/02qvFSMquFSy3CUc1IPf0PQnPAhYINgn33aL84
+RJ38bJUCgYAq1IqTV2FfmkO4a3Q7T4e4bFUy/nEDExpd5AL3YQRTcJ4BaVyaGUn+
++XW0mvzJJ6u9ltnnuHD/xpQPDQtieX2g6nz5TrXqlIVowz4ZMQqdyvzVpUjwNjw7
+dZYZA1zeX23iBBPNt6M5nihgn4cqqWXySlv6Vq5mNX9z/qK1UpRYrA==
+-----END RSA PRIVATE KEY-----"
+
+TAMBIÉN AGREGA/DESCOMENTA ESTO EN apps\open-swe\.env:
+
+GITHUB_WEBHOOK_SECRET="dummy-webhook-secret-for-local-dev"
+
+=======================================
+ARCHIVOS A EDITAR:
+
+1. apps\open-swe\.env
+   - Reemplaza el GITHUB_APP_PRIVATE_KEY completo
+   - Descomenta GITHUB_WEBHOOK_SECRET (quita el #)
+
+2. apps\web\.env  
+   - Reemplaza el GITHUB_APP_PRIVATE_KEY completo
+   - Agrega GITHUB_WEBHOOK_SECRET si no existe
+
+=======================================
+DESPUÉS DE EDITAR:
+
+1. Guarda ambos archivos
+2. Reinicia los servidores:
+   Terminal 1: cd apps\open-swe; node ..\..\yarn.js dev
+   Terminal 2: cd apps\web; node ..\..\yarn.js dev

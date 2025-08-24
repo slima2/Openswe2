@@ -191,43 +191,51 @@ export async function classifyMessage(
 
   const newMessages: BaseMessage[] = [response];
 
-  // If it's not a no_op, ensure there is a GitHub issue with the user's request.
+  // MODIFIED: Skip GitHub issue creation for local development
+  // Try to create issue, but continue without it if it fails
   if (!githubIssueId) {
-    const { title } = await createIssueFieldsFromMessages(
-      state.messages,
-      config.configurable,
-    );
-    const { content: body } = extractIssueTitleAndContentFromMessage(
-      getMessageContentString(userMessage.content),
-    );
+    try {
+      const { title } = await createIssueFieldsFromMessages(
+        state.messages,
+        config.configurable,
+      );
+      const { content: body } = extractIssueTitleAndContentFromMessage(
+        getMessageContentString(userMessage.content),
+      );
 
-    const newIssue = await createIssue({
-      owner: state.targetRepository.owner,
-      repo: state.targetRepository.repo,
-      title,
-      body: formatContentForIssueBody(body),
-      githubAccessToken,
-    });
-    if (!newIssue) {
-      throw new Error("Failed to create issue.");
+      const newIssue = await createIssue({
+        owner: state.targetRepository.owner,
+        repo: state.targetRepository.repo,
+        title,
+        body: formatContentForIssueBody(body),
+        githubAccessToken,
+      });
+      
+      if (newIssue) {
+        githubIssueId = newIssue.number;
+        // Ensure we remove the old message, and replace it with an exact copy,
+        // but with the issue ID & isOriginalIssue set in additional_kwargs.
+        newMessages.push(
+          ...[
+            new RemoveMessage({
+              id: userMessage.id ?? "",
+            }),
+            new HumanMessage({
+              ...userMessage,
+              additional_kwargs: {
+                githubIssueId: githubIssueId,
+                isOriginalIssue: true,
+              },
+            }),
+          ],
+        );
+      }
+    } catch (error) {
+      // Log warning but continue without issue
+      console.warn("GitHub issue creation failed (continuing without issue):", error);
+      // Use a dummy issue ID of 0 to indicate no real issue
+      githubIssueId = 0;
     }
-    githubIssueId = newIssue.number;
-    // Ensure we remove the old message, and replace it with an exact copy,
-    // but with the issue ID & isOriginalIssue set in additional_kwargs.
-    newMessages.push(
-      ...[
-        new RemoveMessage({
-          id: userMessage.id ?? "",
-        }),
-        new HumanMessage({
-          ...userMessage,
-          additional_kwargs: {
-            githubIssueId: githubIssueId,
-            isOriginalIssue: true,
-          },
-        }),
-      ],
-    );
   } else if (
     githubIssueId &&
     state.messages.filter(isHumanMessage).length > 1
