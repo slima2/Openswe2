@@ -33,7 +33,16 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
-
+.env.*
+*.env*
+*env*backup*.txt
+apps/open-swe/fix-env*
+apps/open-swe/*.env*
+apps/open-swe/*env*.txt
+apps/open-swe/.env2 BACKUP.txt
+apps/open-swe/.envbackup.txt
+apps/open-swe/envbackupfinal2.txt
+apps/open-swe/fix-env.ps1
 # vercel
 .vercel
 
@@ -47,3 +56,10 @@ credentials.json
 .langgraph_api
 
 **/.claude/settings.local.json
+# Never commit env/backup secrets
+.env
+.env.*
+*.env
+*env*backup*.txt
+apps/open-swe/*.env*
+apps/open-swe/*env*.txt
