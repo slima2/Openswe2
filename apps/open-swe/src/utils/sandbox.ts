@@ -66,6 +66,26 @@ export async function deleteSandbox(
 }
 
 async function createSandbox(attempt: number): Promise<Sandbox | null> {
+  // Check if we're on Windows or local mode is enabled
+  const isWindows = process.platform === 'win32';
+  const isLocalMode = process.env.OPEN_SWE_LOCAL_MODE === "true";
+  
+  if (isWindows || isLocalMode) {
+    // Return a mock sandbox for Windows/local mode
+    logger.info("Using local mode instead of Daytona (Windows or local mode detected)", {
+      platform: process.platform,
+      localMode: isLocalMode
+    });
+    
+    // Return a minimal mock sandbox that satisfies the interface
+    return {
+      id: `local-sandbox-${Date.now()}`,
+      state: "started" as any,
+      // Add any other required properties with default values
+    } as Sandbox;
+  }
+  
+  // Original Daytona code for non-Windows systems
   try {
     return await daytonaClient().create(DEFAULT_SANDBOX_CREATE_PARAMS, {
       timeout: 100, // 100s timeout on creation.
@@ -97,16 +117,26 @@ export async function getSandboxWithErrorHandling(
   codebaseTree: string | null;
   dependenciesInstalled: boolean | null;
 }> {
-  if (isLocalMode(config)) {
+  // Check for Windows or local mode first
+  const isWindows = process.platform === 'win32';
+  const isLocalModeEnv = process.env.OPEN_SWE_LOCAL_MODE === "true";
+  
+  if (isWindows || isLocalModeEnv || isLocalMode(config)) {
+    logger.info("Using local mode for sandbox operations", {
+      platform: process.platform,
+      localModeEnv: isLocalModeEnv,
+      configLocalMode: isLocalMode(config)
+    });
+    
     const mockSandbox = {
-      id: sandboxSessionId || "local-mock-sandbox",
+      id: sandboxSessionId || `local-mock-sandbox-${Date.now()}`,
       state: "started",
     } as Sandbox;
 
     return {
       sandbox: mockSandbox,
-      codebaseTree: null,
-      dependenciesInstalled: null,
+      codebaseTree: "Local project directory",
+      dependenciesInstalled: false,
     };
   }
   try {
@@ -161,6 +191,27 @@ export async function getSandboxWithErrorHandling(
 
     const { githubInstallationToken } = getGitHubTokensFromConfig(config);
 
+    // Check if we're in local mode
+    const isWindows = process.platform === 'win32';
+    const isLocalModeEnv = process.env.OPEN_SWE_LOCAL_MODE === "true";
+    
+    if (isWindows || isLocalModeEnv) {
+      // In local mode, skip cloning and use local directory
+      logger.info("Using local project directory instead of cloning", {
+        localPath: process.env.OPEN_SWE_LOCAL_PROJECT_PATH || process.cwd()
+      });
+      
+      // Return minimal codebase tree for local mode
+      const codebaseTreeToReturn = "Local project directory";
+      
+      return {
+        sandbox,
+        codebaseTree: codebaseTreeToReturn,
+        dependenciesInstalled: false,
+      };
+    }
+    
+    // Original code for non-local mode
     // Clone repository
     await cloneRepo(sandbox, targetRepository, {
       githubInstallationToken,
