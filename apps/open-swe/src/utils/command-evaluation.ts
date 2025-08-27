@@ -56,6 +56,7 @@ export interface CommandEvaluationResult {
 
 // Commands that are known to be safe for reading
 const SAFE_READ_COMMANDS = [
+  // Unix/Linux commands
   "ls",
   "cat",
   "head",
@@ -90,6 +91,30 @@ const SAFE_READ_COMMANDS = [
   "hash",
   "history",
   "alias",
+  // Windows commands
+  "dir",
+  "cd",
+  "type",
+  "more",
+  "findstr",
+  "tree",
+  "attrib",
+  "fc",
+  "comp",
+  "tasklist",
+  "systeminfo",
+  "ipconfig",
+  "netstat",
+  "nslookup",
+  "ping",
+  "tracert",
+  "hostname",
+  "ver",
+  "date",
+  "time",
+  "whoami",
+  "where",
+  "wmic",
 ];
 
 export function isSafeReadCommand(command: string): boolean {

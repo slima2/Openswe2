@@ -1,4 +1,5 @@
-import { join } from "path";
+import { join, dirname } from "path";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { tool } from "@langchain/core/tools";
 import { GraphState, GraphConfig } from "@open-swe/shared/open-swe/types";
 import { createLogger, LogLevel } from "../../utils/logger.js";
@@ -14,9 +15,8 @@ import {
 import {
   isLocalMode,
   getLocalWorkingDirectory,
+  convertDaytonaPathToLocal,
 } from "@open-swe/shared/open-swe/local-mode";
-import { TIMEOUT_SEC } from "@open-swe/shared/constants";
-import { getLocalShellExecutor } from "../../utils/shell-executor/index.js";
 
 const logger = createLogger(LogLevel.INFO, "TextEditorTool");
 
@@ -44,35 +44,31 @@ export function createTextEditorTool(
         let result: string;
 
         if (localMode) {
-          // Local mode: use LocalShellExecutor for file operations
-          const executor = getLocalShellExecutor(localAbsolutePath);
+          // Local mode: use Node.js file operations directly
 
-          // Convert sandbox path to local path
-          let localPath = path;
-          if (path.startsWith("/home/daytona/project/")) {
-            // Remove the sandbox prefix to get the relative path
-            localPath = path.replace("/home/daytona/project/", "");
-          } else if (path.startsWith("/home/daytona/local/")) {
-            // Remove the local sandbox prefix to get the relative path
-            localPath = path.replace("/home/daytona/local/", "");
-          }
-          const filePath = join(workDir, localPath);
+                  // Convert Daytona path to local Windows path
+        let filePath: string;
+        if (path.startsWith("/home/daytona/")) {
+          // Extract project name from path
+          const match = path.match(/^\/home\/daytona\/([^\/]+)/);
+          const projectName = match ? match[1] : "default-project";
+          filePath = convertDaytonaPathToLocal(path, projectName);
+        } else {
+          // Use path as-is if it's already a local path
+          filePath = path.includes(':') ? path : join(workDir, path);
+        }
 
           switch (command) {
             case "view": {
-              // Use cat command to view file content
-              const viewResponse = await executor.executeCommand(
-                `cat "${filePath}"`,
-                {
-                  workdir: workDir,
-                  timeout: TIMEOUT_SEC,
-                  localMode: true,
-                },
-              );
-              if (viewResponse.exitCode !== 0) {
-                throw new Error(`Failed to read file: ${viewResponse.result}`);
+              // Use Node.js file system to read file
+              try {
+                if (!existsSync(filePath)) {
+                  throw new Error(`File not found: ${filePath}`);
+                }
+                result = readFileSync(filePath, 'utf-8');
+              } catch (error: any) {
+                throw new Error(`Failed to read file: ${error.message}`);
               }
-              result = viewResponse.result;
               break;
             }
             case "str_replace": {
@@ -81,55 +77,40 @@ export function createTextEditorTool(
                   "str_replace command requires both old_str and new_str parameters",
                 );
               }
-              // Use sed command for string replacement with proper escaping
-              const escapedOldStr = old_str
-                .replace(/\\/g, "\\\\")
-                .replace(/\//g, "\\/")
-                .replace(/'/g, "'\"'\"'");
-              const escapedNewStr = new_str
-                .replace(/\\/g, "\\\\")
-                .replace(/\//g, "\\/")
-                .replace(/'/g, "'\"'\"'");
-
-              const sedResponse = await executor.executeCommand(
-                `sed -i 's/${escapedOldStr}/${escapedNewStr}/g' "${filePath}"`,
-                {
-                  workdir: workDir,
-                  timeout: TIMEOUT_SEC,
-                  localMode: true,
-                },
-              );
-              if (sedResponse.exitCode !== 0) {
-                throw new Error(
-                  `Failed to replace string: ${sedResponse.result}`,
-                );
+              // Use Node.js file system for string replacement
+              try {
+                if (!existsSync(filePath)) {
+                  throw new Error(`File not found: ${filePath}`);
+                }
+                let content = readFileSync(filePath, 'utf-8');
+                const occurrences = content.split(old_str).length - 1;
+                if (occurrences === 0) {
+                  throw new Error(`String '${old_str}' not found in file`);
+                }
+                content = content.replace(new RegExp(old_str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), new_str);
+                writeFileSync(filePath, content, 'utf-8');
+                result = `Successfully replaced ${occurrences} occurrence(s) of '${old_str}' with '${new_str}' in ${path}`;
+              } catch (error: any) {
+                throw new Error(`Failed to replace string: ${error.message}`);
               }
-              result = `Successfully replaced '${old_str}' with '${new_str}' in ${path}`;
               break;
             }
             case "create": {
               if (!file_text) {
                 throw new Error("create command requires file_text parameter");
               }
-              // Create file with content using proper escaping
-              const escapedFileText = file_text
-                .replace(/\\/g, "\\\\")
-                .replace(/'/g, "'\"'\"'");
-
-              const createResponse = await executor.executeCommand(
-                `echo '${escapedFileText}' > "${filePath}"`,
-                {
-                  workdir: workDir,
-                  timeout: TIMEOUT_SEC,
-                  localMode: true,
-                },
-              );
-              if (createResponse.exitCode !== 0) {
-                throw new Error(
-                  `Failed to create file: ${createResponse.result}`,
-                );
+              // Use Node.js file system to create file
+              try {
+                // Create directory if it doesn't exist
+                const dir = dirname(filePath);
+                if (!existsSync(dir)) {
+                  mkdirSync(dir, { recursive: true });
+                }
+                writeFileSync(filePath, file_text, 'utf-8');
+                result = `Successfully created file ${path}`;
+              } catch (error: any) {
+                throw new Error(`Failed to create file: ${error.message}`);
               }
-              result = `Successfully created file ${path}`;
               break;
             }
             case "insert": {
@@ -138,26 +119,20 @@ export function createTextEditorTool(
                   "insert command requires both insert_line and new_str parameters",
                 );
               }
-              // Insert line at specific position with proper escaping
-              const escapedNewStr = new_str
-                .replace(/\\/g, "\\\\")
-                .replace(/\//g, "\\/")
-                .replace(/'/g, "'\"'\"'");
-
-              const insertResponse = await executor.executeCommand(
-                `sed -i '${insert_line}i\\${escapedNewStr}' "${filePath}"`,
-                {
-                  workdir: workDir,
-                  timeout: TIMEOUT_SEC,
-                  localMode: true,
-                },
-              );
-              if (insertResponse.exitCode !== 0) {
-                throw new Error(
-                  `Failed to insert line: ${insertResponse.result}`,
-                );
+              // Use Node.js file system to insert line
+              try {
+                if (!existsSync(filePath)) {
+                  throw new Error(`File not found: ${filePath}`);
+                }
+                const content = readFileSync(filePath, 'utf-8');
+                const lines = content.split('\n');
+                // Insert at the specified line (0-based index)
+                lines.splice(insert_line, 0, new_str);
+                writeFileSync(filePath, lines.join('\n'), 'utf-8');
+                result = `Successfully inserted line at position ${insert_line} in ${path}`;
+              } catch (error: any) {
+                throw new Error(`Failed to insert line: ${error.message}`);
               }
-              result = `Successfully inserted line at position ${insert_line} in ${path}`;
               break;
             }
             default:

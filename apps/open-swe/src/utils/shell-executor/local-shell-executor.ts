@@ -79,20 +79,15 @@ export class LocalShellExecutor {
         cwd 
       });
       
-      // Create child process based on platform
-      const child = isWindows
-        ? spawn('cmd.exe', ['/c', command], {
-            cwd,
-            env: { ...process.env, ...env },
-            timeout: timeout * 1000,
-            shell: false,
-          })
-        : spawn('/bin/sh', ['-c', command], {
-            cwd,
-            env: { ...process.env, ...env },
-            timeout: timeout * 1000,
-            shell: false,
-          });
+      // Use shell: true for Windows to avoid cmd.exe path issues
+      // This lets Node.js find the appropriate shell automatically
+      const child = spawn(command, [], {
+        cwd,
+        env: { ...process.env, ...env },
+        timeout: timeout * 1000,
+        shell: true,  // This is crucial for Windows compatibility
+        windowsHide: true,  // Hide console window on Windows
+      });
 
       child.stdout?.on("data", (data) => {
         stdout += data.toString();

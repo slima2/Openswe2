@@ -67,13 +67,15 @@ Examples of UNSAFE commands:
 - "rm -rf node_modules package-lock.json" (deletes project dependencies)
 
 Examples of SAFE commands:
-- "ls -la" (lists files)
-- "cat package.json" (reads file)
+- "ls -la" or "dir" (lists files)
+- "cat package.json" or "type package.json" (reads file)
 - "npm install" (installs packages)
 - "git status" (git read operations)
 - "mkdir new-folder" (creates directory)
-- "touch file.txt" (creates file)
+- "touch file.txt" or "echo. > file.txt" (creates file)
 - "echo 'hello' > test.txt" (writes to file)
+- "pwd" or "cd" (shows current directory)
+- "dir /b" (Windows directory listing)
 
 Evaluate the safety of this command. If it's a normal development task, mark it as safe.`;
 

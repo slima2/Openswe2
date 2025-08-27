@@ -28,7 +28,7 @@ export async function handleViewCommand(
     if (statOutput.exitCode === 0 && statOutput.result?.includes("directory")) {
       // List directory contents
       const lsOutput = await executor.executeCommand({
-        command: `ls -la "${path}"`,
+        command: process.platform === 'win32' ? `dir "${path}"` : `ls -la "${path}"`,
         workdir: workDir,
         sandbox,
       });

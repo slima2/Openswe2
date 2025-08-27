@@ -277,14 +277,14 @@ export async function initializeSandbox(
     
     // Jump to local mode initialization with config marked as local
     // Ensure thread_id and assistant_id are always present
-    const localConfig = {
+    const localConfig: GraphConfig = {
       ...config,
       configurable: {
         ...(config?.configurable || {}),
-        "x-local-mode": "true",
+        "x-local-mode": "true" as any,
         thread_id: config?.configurable?.thread_id || `local-thread-${Date.now()}`,
         assistant_id: config?.configurable?.assistant_id || `local-assistant-${Date.now()}`,
-      },
+      } as GraphConfig['configurable'],
     };
     return initializeSandboxLocal(
       state,

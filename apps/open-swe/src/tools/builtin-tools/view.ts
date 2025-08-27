@@ -8,10 +8,12 @@ import { createViewToolFields } from "@open-swe/shared/open-swe/tools";
 import { handleViewCommand } from "./handlers.js";
 import {
   isLocalMode,
-  getLocalWorkingDirectory,
+  convertDaytonaPathToLocal,
+  getProjectDirectory,
 } from "@open-swe/shared/open-swe/local-mode";
 import { TIMEOUT_SEC } from "@open-swe/shared/constants";
 import { createShellExecutor } from "../../utils/shell-executor/index.js";
+import { existsSync, mkdirSync } from "fs";
 
 const logger = createLogger(LogLevel.INFO, "ViewTool");
 
@@ -27,20 +29,36 @@ export function createViewTool(
           throw new Error(`Unknown command: ${command}`);
         }
 
+        // Extract project name from path if it contains Daytona-style paths
+        let projectName = "default-project";
+        if (path && path.startsWith("/home/daytona/")) {
+          const match = path.match(/^\/home\/daytona\/([^\/]+)/);
+          if (match) {
+            projectName = match[1];
+          }
+        }
+        
         const workDir = isLocalMode(config)
-          ? getLocalWorkingDirectory()
+          ? getProjectDirectory(projectName)
           : getRepoAbsolutePath(state.targetRepository);
+          
+        // Create the project directory if it doesn't exist (only in local mode)
+        if (isLocalMode(config) && !existsSync(workDir)) {
+          logger.info(`Creating project directory: ${workDir}`);
+          mkdirSync(workDir, { recursive: true });
+        }
 
         let result: string;
         if (isLocalMode(config)) {
           // Local mode: use ShellExecutor for file viewing
           const executor = createShellExecutor(config);
 
-          // Convert sandbox path to local path
+          // Convert Daytona path to local Windows path
           let localPath = path;
           if (path.startsWith("/home/daytona/")) {
-            // Remove the sandbox prefix to get the relative path
-            localPath = path.replace(/^\/home\/daytona\/[^\/]+\/?/, "");
+            const fullLocalPath = convertDaytonaPathToLocal(path, projectName);
+            // Get the relative path within the project
+            localPath = fullLocalPath.replace(workDir + (process.platform === 'win32' ? '\\' : '/'), '');
           }
           
           // If it's just the base path, list directory contents

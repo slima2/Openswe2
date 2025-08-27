@@ -9,7 +9,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "clean": "node -e \"const fs=require('fs');const path=require('path');['./dist','.turbo'].forEach(d=>{try{fs.rmSync(d,{recursive:true,force:true})}catch{}})\"",
+    "clean": "rimraf ./dist .turbo",
     "build": "yarn clean && tsc",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -28,6 +28,7 @@
     "zod": "^3.25.32"
   },
   "devDependencies": {
+    "rimraf": "^5.0.5",
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.19.0",
     "@jest/globals": "^29.7.0",

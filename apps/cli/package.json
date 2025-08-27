@@ -6,7 +6,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "clean": "node -e \"const fs=require('fs');const path=require('path');['./dist','.turbo'].forEach(d=>{try{fs.rmSync(d,{recursive:true,force:true})}catch{}})\"",
+    "clean": "rimraf ./dist .turbo",
     "build": "yarn clean && tsc",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -26,6 +26,7 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "rimraf": "^5.0.5",
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.19.0",
     "@tsconfig/recommended": "^1.0.8",
