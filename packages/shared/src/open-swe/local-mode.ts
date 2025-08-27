@@ -28,5 +28,9 @@ export function getLocalWorkingDirectory(): string {
  * (useful for contexts where GraphConfig is not available)
  */
 export function isLocalModeFromEnv(): boolean {
+  // Always use local mode on Windows
+  if (process.platform === 'win32') {
+    return true;
+  }
   return process.env.OPEN_SWE_LOCAL_MODE === "true";
 }

@@ -9,7 +9,7 @@ export function generateJWT(appId: string, privateKey: string): string {
   const payload = {
     iat: now,
     exp: now + 10 * 60,
-    iss: appId,
+    iss: parseInt(appId, 10), // GitHub requires 'iss' to be an integer
   };
 
   return jsonwebtoken.sign(payload, privateKey, { algorithm: "RS256" });

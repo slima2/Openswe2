@@ -269,10 +269,17 @@ export async function initializeSandbox(
     
     emitStepEvent(baseCreateSandboxAction, "skipped", "Using local mode instead of Daytona");
     
-    // Jump to local mode initialization
+    // Jump to local mode initialization with config marked as local
+    const localConfig = {
+      ...config,
+      configurable: {
+        ...(config?.configurable || {}),
+        "x-local-mode": "true",
+      },
+    };
     return initializeSandboxLocal(
       state,
-      config,
+      localConfig,
       emitStepEvent,
       createEventsMessage,
     );

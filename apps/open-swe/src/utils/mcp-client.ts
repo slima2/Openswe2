@@ -86,6 +86,12 @@ export async function getMcpTools(
   config: GraphConfig,
 ): Promise<StructuredToolInterface[]> {
   try {
+    // Skip MCP tools in Windows/local mode due to uvx dependency
+    if (process.platform === 'win32' || process.env.OPEN_SWE_LOCAL_MODE === "true") {
+      logger.info("Skipping MCP tools in local/Windows mode");
+      return [];
+    }
+
     // TODO: Remove default MCP servers obj once UI is implemented
     const mergedServers: McpServers = { ...DEFAULT_MCP_SERVERS };
 

@@ -38,24 +38,42 @@ export function createViewTool(
 
           // Convert sandbox path to local path
           let localPath = path;
-          if (path.startsWith("/home/daytona/project/")) {
+          if (path.startsWith("/home/daytona/")) {
             // Remove the sandbox prefix to get the relative path
-            localPath = path.replace("/home/daytona/project/", "");
+            localPath = path.replace(/^\/home\/daytona\/[^\/]+\/?/, "");
           }
-          const filePath = join(workDir, localPath);
+          
+          // If it's just the base path, list directory contents
+          if (!localPath || localPath === "" || localPath === ".") {
+            const response = await executor.executeCommand({
+              command: process.platform === 'win32' ? "dir /b" : "ls -la",
+              workdir: workDir,
+              timeout: TIMEOUT_SEC,
+            });
+            
+            if (response.exitCode !== 0) {
+              throw new Error(`Failed to list directory: ${response.result}`);
+            }
+            result = response.result;
+          } else {
+            const filePath = join(workDir, localPath);
 
-          // Use cat command to view file content
-          const response = await executor.executeCommand({
-            command: `cat "${filePath}"`,
-            workdir: workDir,
-            timeout: TIMEOUT_SEC,
-          });
+            // Use appropriate command for Windows
+            const viewCommand = process.platform === 'win32' 
+              ? `type "${filePath}"`
+              : `cat "${filePath}"`;
+              
+            const response = await executor.executeCommand({
+              command: viewCommand,
+              workdir: workDir,
+              timeout: TIMEOUT_SEC,
+            });
 
-          if (response.exitCode !== 0) {
-            throw new Error(`Failed to read file: ${response.result}`);
+            if (response.exitCode !== 0) {
+              throw new Error(`Failed to read file: ${response.result}`);
+            }
+            result = response.result;
           }
-
-          result = response.result;
         } else {
           // Sandbox mode: use existing handler
           const sandbox = await getSandboxSessionOrThrow(input);

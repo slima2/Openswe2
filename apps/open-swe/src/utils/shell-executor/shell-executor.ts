@@ -26,6 +26,13 @@ export class ShellExecutor {
 
   constructor(config?: GraphConfig) {
     this.config = config;
+    // Force local mode on Windows
+    if (process.platform === 'win32' && this.config) {
+      (this.config.configurable as any) = {
+        ...(this.config.configurable || {}),
+        "x-local-mode": "true"
+      };
+    }
   }
 
   /**
@@ -97,11 +104,23 @@ export class ShellExecutor {
     sandbox?: Sandbox,
     sandboxSessionId?: string,
   ): Promise<LocalExecuteResponse> {
+    // On Windows, fallback to local execution
+    if (process.platform === 'win32') {
+      logger.info("Windows detected in executeSandbox, falling back to local execution");
+      return this.executeLocal(command, workdir, env, timeout);
+    }
+
     const sandbox_ =
       sandbox ??
       (await getSandboxSessionOrThrow({
         xSandboxSessionId: sandboxSessionId,
       }));
+
+    // Check if sandbox has process object
+    if (!sandbox_ || !sandbox_.process) {
+      logger.warn("Sandbox or sandbox.process is undefined, falling back to local execution");
+      return this.executeLocal(command, workdir, env, timeout);
+    }
 
     return await sandbox_.process.executeCommand(
       command,
