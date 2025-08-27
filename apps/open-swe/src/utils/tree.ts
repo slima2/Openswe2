@@ -16,6 +16,37 @@ const logger = createLogger(LogLevel.INFO, "Tree");
 export const FAILED_TO_GENERATE_TREE_MESSAGE =
   "Failed to generate tree. Please try again.";
 
+/**
+ * Format a list of file paths into a tree-like structure
+ */
+function formatFilesAsTree(files: string[]): string {
+  if (!files || files.length === 0) {
+    return "Empty directory";
+  }
+
+  const tree: string[] = ["."];
+  const processed = new Set<string>();
+  
+  // Group files by directory
+  for (const file of files) {
+    const parts = file.split('/');
+    const depth = Math.min(parts.length - 1, 3); // Limit to 3 levels deep
+    
+    for (let i = 0; i <= depth; i++) {
+      const path = parts.slice(0, i + 1).join('/');
+      if (!processed.has(path)) {
+        processed.add(path);
+        const indent = "│   ".repeat(i);
+        const prefix = i === parts.length - 1 ? "├── " : "├── ";
+        const name = parts[i];
+        tree.push(indent + prefix + name);
+      }
+    }
+  }
+  
+  return tree.join('\n');
+}
+
 export async function getCodebaseTree(
   config: GraphConfig,
   sandboxSessionId_?: string,
@@ -94,7 +125,12 @@ export async function getCodebaseTree(
 async function getCodebaseTreeLocal(config: GraphConfig): Promise<string> {
   try {
     const executor = createShellExecutor(config);
-    const command = `git ls-files | tree --fromfile -L 3`;
+    
+    // Use a simpler command for Windows that doesn't require tree
+    const isWindows = process.platform === 'win32';
+    const command = isWindows 
+      ? `git ls-files`  // Just list files, we'll format them later
+      : `git ls-files | tree --fromfile -L 3`;
 
     const response = await executor.executeCommand({
       command,
@@ -109,6 +145,13 @@ async function getCodebaseTreeLocal(config: GraphConfig): Promise<string> {
       throw new Error(
         `Failed to generate tree in local mode: ${response.result}`,
       );
+    }
+
+    // Format the output if on Windows (simple file list to tree-like structure)
+    if (isWindows && response.result) {
+      const files = response.result.split('\n').filter(f => f.trim());
+      const tree = formatFilesAsTree(files);
+      return tree;
     }
 
     return response.result;

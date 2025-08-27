@@ -23,6 +23,20 @@ export async function getSandboxSessionOrThrow(
     throw new Error("FAILED TO RUN COMMAND: No sandbox session ID provided");
   }
 
+  // Check if we're in local mode
+  const isWindows = process.platform === 'win32';
+  const isLocalModeEnv = process.env.OPEN_SWE_LOCAL_MODE === "true";
+  
+  if (isWindows || isLocalModeEnv) {
+    logger.info("Using mock sandbox in local mode", { sandboxSessionId });
+    // Return a mock sandbox for local mode
+    return {
+      id: sandboxSessionId,
+      state: "started",
+      // Add minimal properties required
+    } as Sandbox;
+  }
+
   const sandbox = await daytonaClient().get(sandboxSessionId);
   return sandbox;
 }

@@ -13,9 +13,17 @@ const logger = createLogger(LogLevel.INFO, "Sandbox");
 let daytonaInstance: Daytona | null = null;
 
 /**
- * Returns a shared Daytona instance
+ * Returns a shared Daytona instance (throws error in local mode)
  */
 export function daytonaClient(): Daytona {
+  // Check if we're in local mode
+  const isWindows = process.platform === 'win32';
+  const isLocalModeEnv = process.env.OPEN_SWE_LOCAL_MODE === "true";
+  
+  if (isWindows || isLocalModeEnv) {
+    throw new Error("Daytona client should not be used in local mode");
+  }
+  
   if (!daytonaInstance) {
     daytonaInstance = new Daytona();
   }
@@ -31,6 +39,15 @@ export function daytonaClient(): Daytona {
  * @returns The sandbox session ID.
  */
 export async function stopSandbox(sandboxSessionId: string): Promise<string> {
+  // Check if we're in local mode
+  const isWindows = process.platform === 'win32';
+  const isLocalModeEnv = process.env.OPEN_SWE_LOCAL_MODE === "true";
+  
+  if (isWindows || isLocalModeEnv) {
+    logger.info("Skipping sandbox stop in local mode", { sandboxSessionId });
+    return sandboxSessionId;
+  }
+  
   const sandbox = await daytonaClient().get(sandboxSessionId);
   if (
     sandbox.state === SandboxState.STOPPED ||
@@ -52,6 +69,15 @@ export async function stopSandbox(sandboxSessionId: string): Promise<string> {
 export async function deleteSandbox(
   sandboxSessionId: string,
 ): Promise<boolean> {
+  // Check if we're in local mode
+  const isWindows = process.platform === 'win32';
+  const isLocalModeEnv = process.env.OPEN_SWE_LOCAL_MODE === "true";
+  
+  if (isWindows || isLocalModeEnv) {
+    logger.info("Skipping sandbox deletion in local mode", { sandboxSessionId });
+    return true;
+  }
+  
   try {
     const sandbox = await daytonaClient().get(sandboxSessionId);
     await daytonaClient().delete(sandbox);

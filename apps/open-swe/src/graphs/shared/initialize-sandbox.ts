@@ -143,7 +143,13 @@ export async function initializeSandbox(
     emitStepEvent(baseResumeSandboxAction, "pending");
 
     try {
-      const existingSandbox = await daytonaClient().get(sandboxSessionId);
+      // Check if we're in local mode
+      const isWindows = process.platform === 'win32';
+      const isLocalModeEnv = process.env.OPEN_SWE_LOCAL_MODE === "true";
+      
+      const existingSandbox = (isWindows || isLocalModeEnv) 
+        ? { id: sandboxSessionId, state: "started" } as any
+        : await daytonaClient().get(sandboxSessionId);
       emitStepEvent(baseResumeSandboxAction, "success");
 
       const pullLatestChangesActionId = uuidv4();
@@ -270,11 +276,14 @@ export async function initializeSandbox(
     emitStepEvent(baseCreateSandboxAction, "skipped", "Using local mode instead of Daytona");
     
     // Jump to local mode initialization with config marked as local
+    // Ensure thread_id and assistant_id are always present
     const localConfig = {
       ...config,
       configurable: {
         ...(config?.configurable || {}),
         "x-local-mode": "true",
+        thread_id: config?.configurable?.thread_id || `local-thread-${Date.now()}`,
+        assistant_id: config?.configurable?.assistant_id || `local-assistant-${Date.now()}`,
       },
     };
     return initializeSandboxLocal(
@@ -284,17 +293,29 @@ export async function initializeSandbox(
       createEventsMessage,
     );
   } else {
-    try {
-      sandbox = await daytonaClient().create(DEFAULT_SANDBOX_CREATE_PARAMS);
-      emitStepEvent(baseCreateSandboxAction, "success");
-    } catch (e) {
-      logger.error("Failed to create sandbox environment", { e });
-      emitStepEvent(
-        baseCreateSandboxAction,
-        "error",
-        "Failed to create sandbox environment. Please try again later.",
-      );
-      throw new Error("Failed to create sandbox environment.");
+    // Should never reach here in local mode, but add check for safety
+    const isWindows = process.platform === 'win32';
+    const isLocalModeEnv = process.env.OPEN_SWE_LOCAL_MODE === "true";
+    
+    if (isWindows || isLocalModeEnv) {
+      sandbox = {
+        id: `local-fallback-${Date.now()}`,
+        state: "started",
+      } as any;
+      emitStepEvent(baseCreateSandboxAction, "skipped", "Using local mode");
+    } else {
+      try {
+        sandbox = await daytonaClient().create(DEFAULT_SANDBOX_CREATE_PARAMS);
+        emitStepEvent(baseCreateSandboxAction, "success");
+      } catch (e) {
+        logger.error("Failed to create sandbox environment", { e });
+        emitStepEvent(
+          baseCreateSandboxAction,
+          "error",
+          "Failed to create sandbox environment. Please try again later.",
+        );
+        throw new Error("Failed to create sandbox environment.");
+      }
     }
   }
 

@@ -68,58 +68,55 @@ export class LocalShellExecutor {
     timeout: number,
   ): Promise<LocalExecuteResponse> {
     return new Promise((resolve, reject) => {
-      // Try different shell paths
-      const shellPaths = [
-        "/bin/bash",
-        "/usr/bin/bash",
-        "/bin/sh",
-        "/usr/bin/sh",
-      ];
-      let lastError: Error | null = null;
-
-      const tryShell = (shellPath: string) => {
-        const child = spawn(shellPath, ["-c", command], {
-          cwd,
-          env: { ...process.env, ...env },
-          timeout: timeout * 1000,
-        });
-
-        let stdout = "";
-        let stderr = "";
-
-        child.stdout?.on("data", (data) => {
-          stdout += data.toString();
-        });
-
-        child.stderr?.on("data", (data) => {
-          stderr += data.toString();
-        });
-
-        child.on("close", (code) => {
-          resolve({
-            exitCode: code || 0,
-            result: stdout,
-            artifacts: {
-              stdout,
-              stderr,
-            },
+      const isWindows = process.platform === 'win32';
+      
+      let stdout = "";
+      let stderr = "";
+      
+      // Log platform detection for debugging
+      logger.info(`Platform detection: ${process.platform}, isWindows: ${isWindows}`, { 
+        command: command.substring(0, 50),
+        cwd 
+      });
+      
+      // Create child process based on platform
+      const child = isWindows
+        ? spawn('cmd.exe', ['/c', command], {
+            cwd,
+            env: { ...process.env, ...env },
+            timeout: timeout * 1000,
+            shell: false,
+          })
+        : spawn('/bin/sh', ['-c', command], {
+            cwd,
+            env: { ...process.env, ...env },
+            timeout: timeout * 1000,
+            shell: false,
           });
-        });
 
-        child.on("error", (error) => {
-          lastError = error;
-          // Try next shell path
-          const nextIndex = shellPaths.indexOf(shellPath) + 1;
-          if (nextIndex < shellPaths.length) {
-            tryShell(shellPaths[nextIndex]);
-          } else {
-            reject(lastError);
-          }
-        });
-      };
+      child.stdout?.on("data", (data) => {
+        stdout += data.toString();
+      });
 
-      // Start with the first shell path
-      tryShell(shellPaths[0]);
+      child.stderr?.on("data", (data) => {
+        stderr += data.toString();
+      });
+
+      child.on("close", (code) => {
+        resolve({
+          exitCode: code || 0,
+          result: stdout,
+          artifacts: {
+            stdout,
+            stderr,
+          },
+        });
+      });
+
+      child.on("error", (error) => {
+        logger.error(`Failed to execute command: ${error.message}`, { command, cwd });
+        reject(error);
+      });
     });
   }
 
