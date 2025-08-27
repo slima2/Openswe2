@@ -16,12 +16,20 @@ import { encryptSecret } from "@open-swe/shared/crypto";
 // This file acts as a proxy for requests to your LangGraph server.
 // Read the [Going to Production](https://github.com/langchain-ai/agent-chat-ui?tab=readme-ov-file#going-to-production) section for more information.
 
+// Check if we're in local mode
+const isLocalMode = process.env.OPEN_SWE_LOCAL_MODE === "true" || process.env.NODE_ENV === "development";
+
 export const { GET, POST, PUT, PATCH, DELETE, OPTIONS, runtime } =
   initApiPassthrough({
     apiUrl: process.env.LANGGRAPH_API_URL ?? "http://localhost:2024",
     runtime: "edge", // default
     disableWarningLog: true,
     bodyParameters: (req, body) => {
+      // In local mode, add x-local-mode flag to configurable
+      if (isLocalMode && body.config?.configurable) {
+        body.config.configurable["x-local-mode"] = "true";
+      }
+      
       if (body.config?.configurable && "apiKeys" in body.config.configurable) {
         const encryptionKey = process.env.SECRETS_ENCRYPTION_KEY;
         if (!encryptionKey) {
@@ -49,6 +57,14 @@ export const { GET, POST, PUT, PATCH, DELETE, OPTIONS, runtime } =
       return body;
     },
     headers: async (req) => {
+      // In local mode, return minimal headers needed for local development
+      if (isLocalMode) {
+        return {
+          "x-local-mode": "true",
+          // Add any other headers needed for local mode
+        };
+      }
+      
       const encryptionKey = process.env.SECRETS_ENCRYPTION_KEY;
       if (!encryptionKey) {
         throw new Error(
