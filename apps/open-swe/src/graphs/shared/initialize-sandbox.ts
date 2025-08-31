@@ -28,6 +28,9 @@ import {
   isLocalMode,
   getLocalWorkingDirectory,
 } from "@open-swe/shared/open-swe/local-mode";
+import { accessSync } from "fs";
+import { execSync } from "child_process";
+import { createShellExecutor } from "../../utils/shell-executor/shell-executor.js";
 
 const logger = createLogger(LogLevel.INFO, "InitializeSandbox");
 
@@ -39,6 +42,7 @@ type InitializeSandboxState = {
   messages?: BaseMessage[];
   dependenciesInstalled?: boolean;
   customRules?: CustomRules;
+  preflightPassed?: boolean;
 };
 
 export async function initializeSandbox(
@@ -215,6 +219,7 @@ export async function initializeSandbox(
             absoluteRepoDir,
             config,
           ),
+          preflightPassed: true, // Mark preflight as passed
         };
       } catch {
         emitStepEvent(
@@ -231,6 +236,7 @@ export async function initializeSandbox(
             absoluteRepoDir,
             config,
           ),
+          preflightPassed: true, // Mark preflight as passed
         };
       }
     } catch {
@@ -317,6 +323,50 @@ export async function initializeSandbox(
         throw new Error("Failed to create sandbox environment.");
       }
     }
+  }
+
+  // Preflight check: Verify basic environment functionality
+  const preflightActionId = uuidv4();
+  const basePreflightAction: CustomNodeEvent = {
+    nodeId: INITIALIZE_NODE_ID,
+    createdAt: new Date().toISOString(),
+    actionId: preflightActionId,
+    action: "Preflight environment check",
+    data: {
+      status: "pending",
+      sandboxSessionId: sandbox.id,
+      branch: branchName,
+      repo: repoName,
+    },
+  };
+  emitStepEvent(basePreflightAction, "pending");
+
+  try {
+    // Test basic shell functionality in sandbox
+    const shellExecutor = createShellExecutor(config);
+    const response = await shellExecutor.executeCommand({
+      command: "echo OK",
+      workdir: absoluteRepoDir,
+    });
+    
+    if (response.exitCode !== 0) {
+      throw new Error(`Shell test failed with exit code ${response.exitCode}`);
+    }
+    
+    emitStepEvent(basePreflightAction, "success");
+  } catch (error) {
+    const errorMessage = `Preflight check failed: ${error instanceof Error ? error.message : String(error)}`;
+    emitStepEvent(basePreflightAction, "error", errorMessage);
+    logger.error("Preflight check failed", { error, sandboxId: sandbox.id });
+    
+    // Return early with error state
+    return {
+      sandboxSessionId: sandbox.id,
+      targetRepository,
+      branchName,
+      messages: createEventsMessage(),
+      preflightPassed: false,
+    };
   }
 
   // Cloning repository
@@ -422,6 +472,7 @@ export async function initializeSandbox(
     dependenciesInstalled: false,
     customRules: await getCustomRules(sandbox, absoluteRepoDir, config),
     branchName: newBranchName,
+    preflightPassed: true, // Mark preflight as passed
   };
 }
 
@@ -442,6 +493,44 @@ async function initializeSandboxLocal(
   const { targetRepository, branchName } = state;
   const absoluteRepoDir = getLocalWorkingDirectory(); // Use local working directory in local mode
   const repoName = `${targetRepository.owner}/${targetRepository.repo}`;
+
+  // Preflight check: Verify basic environment functionality
+  const preflightActionId = uuidv4();
+  const basePreflightAction: CustomNodeEvent = {
+    nodeId: INITIALIZE_NODE_ID,
+    createdAt: new Date().toISOString(),
+    actionId: preflightActionId,
+    action: "Preflight environment check",
+    data: {
+      status: "pending",
+      sandboxSessionId: null,
+      branch: branchName,
+      repo: repoName,
+    },
+  };
+  emitStepEvent(basePreflightAction, "pending");
+
+  try {
+    // Check if working directory exists and is accessible
+    accessSync(absoluteRepoDir, 0);
+    
+    // Test basic shell functionality
+    execSync("echo OK", { stdio: "pipe" });
+    
+    emitStepEvent(basePreflightAction, "success");
+  } catch (error) {
+    const errorMessage = `Preflight check failed: ${error instanceof Error ? error.message : String(error)}`;
+    emitStepEvent(basePreflightAction, "error", errorMessage);
+    logger.error("Preflight check failed", { error, absoluteRepoDir });
+    
+    // Return early with error state
+    return {
+      targetRepository,
+      branchName,
+      messages: [...(state.messages || []), ...createEventsMessage()],
+      preflightPassed: false,
+    };
+  }
 
   // Skip sandbox creation in local mode
   emitStepEvent(
@@ -533,5 +622,6 @@ async function initializeSandboxLocal(
     dependenciesInstalled: false,
     customRules: await getCustomRules(null as any, absoluteRepoDir, config),
     branchName: branchName,
+    preflightPassed: true, // Mark preflight as passed
   };
 }

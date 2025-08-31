@@ -29,8 +29,9 @@ export function createShellTool(
 
         if (response.exitCode !== 0) {
           const errorResult = response.result ?? response.artifacts?.stdout;
+          const errorExplanation = getExitCodeExplanation(response.exitCode);
           throw new Error(
-            `Command failed. Exit code: ${response.exitCode}\nResult: ${errorResult}`,
+            `Command failed. Exit code: ${response.exitCode}${errorExplanation}\nResult: ${errorResult}`,
           );
         }
         return {
@@ -56,4 +57,28 @@ export function createShellTool(
   );
 
   return shellTool;
+}
+
+/**
+ * Get a human-readable explanation for common exit codes
+ */
+function getExitCodeExplanation(exitCode: number): string {
+  switch (exitCode) {
+    case 1:
+      return " (General error - command failed to execute properly)";
+    case 2:
+      return " (Syntax error - command has invalid syntax or arguments)";
+    case 126:
+      return " (Command not executable - file exists but cannot be executed)";
+    case 127:
+      return " (Command not found - binary not in PATH or doesn't exist)";
+    case 128:
+      return " (Invalid exit argument - exit code out of range)";
+    case 139:
+      return " (Segmentation fault - program crashed)";
+    case 255:
+      return " (Exit status out of range - command terminated abnormally)";
+    default:
+      return "";
+  }
 }

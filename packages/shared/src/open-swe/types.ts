@@ -264,6 +264,17 @@ export const GraphAnnotation = MessagesZodState.extend({
     default: () => false,
   }),
   /**
+   * Whether the environment preflight checks have passed.
+   * This ensures basic shell functionality and directory access before proceeding.
+   */
+  preflightPassed: withLangGraph(z.custom<boolean>(), {
+    reducer: {
+      schema: z.custom<boolean>(),
+      fn: (_state, update) => update,
+    },
+    default: () => false,
+  }),
+  /**
    * User defined rules.
    */
   customRules: withLangGraph(z.custom<CustomRules>().optional(), {

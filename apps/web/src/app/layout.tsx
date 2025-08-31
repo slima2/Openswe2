@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Open SWE",
-  description: "Open SWE UX by LangChain",
+  title: "GPTfy",
+  description: "GPTfy - Powered by Educastle",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",

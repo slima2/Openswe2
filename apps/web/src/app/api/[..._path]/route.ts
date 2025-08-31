@@ -61,8 +61,7 @@ export const { GET, POST, PUT, PATCH, DELETE, OPTIONS, runtime } =
       if (isLocalMode) {
         return {
           "x-local-mode": "true",
-          // Add any other headers needed for local mode
-        };
+        } as Record<string, string>;
       }
       
       const encryptionKey = process.env.SECRETS_ENCRYPTION_KEY;
@@ -85,11 +84,14 @@ export const { GET, POST, PUT, PATCH, DELETE, OPTIONS, runtime } =
         getInstallationNameFromReq(req.clone(), installationIdCookie),
       ]);
 
-      return {
-        [GITHUB_TOKEN_COOKIE]: getGitHubAccessTokenOrThrow(req, encryptionKey),
-        [GITHUB_INSTALLATION_TOKEN_COOKIE]: installationToken,
-        [GITHUB_INSTALLATION_NAME]: installationName,
-        [GITHUB_INSTALLATION_ID]: installationIdCookie,
-      };
+      const headers: Record<string, string> = {};
+      
+      const accessToken = getGitHubAccessTokenOrThrow(req, encryptionKey);
+      if (accessToken) headers[GITHUB_TOKEN_COOKIE] = accessToken;
+      if (installationToken) headers[GITHUB_INSTALLATION_TOKEN_COOKIE] = installationToken;
+      if (installationName) headers[GITHUB_INSTALLATION_NAME] = installationName;
+      if (installationIdCookie) headers[GITHUB_INSTALLATION_ID] = installationIdCookie;
+
+      return headers;
     },
   });

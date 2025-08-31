@@ -31,7 +31,7 @@ import { useState, useMemo } from "react";
 import { threadsToMetadata } from "@/lib/thread-utils";
 import { Settings, BookOpen } from "lucide-react";
 import NextLink from "next/link";
-import { OpenSWELogoSVG } from "../icons/openswe";
+import { GPTfyLogoSVG } from "../icons/gptfy";
 
 function OpenSettingsButton() {
   return (
@@ -120,7 +120,7 @@ export function DefaultView({ threads, threadsLoading }: DefaultViewProps) {
       <div className="border-border bg-card border-b px-4 py-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <OpenSWELogoSVG
+            <GPTfyLogoSVG
               width={120}
               height={18}
             />

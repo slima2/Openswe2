@@ -1,5 +1,8 @@
 import { App } from "@octokit/app";
 import { Octokit } from "@octokit/core";
+import { createLogger, LogLevel } from "./logger.js";
+
+const logger = createLogger(LogLevel.INFO, "GitHubApp");
 
 const replaceNewlinesWithBackslashN = (str: string) =>
   str.replace(/\n/g, "\\n");
@@ -13,9 +16,7 @@ export class GitHubApp {
       ? replaceNewlinesWithBackslashN(process.env.GITHUB_APP_PRIVATE_KEY)
       : undefined;
     const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
-    console.log("appId", appId);
-    console.log("privateKey", privateKey);
-    console.log("webhookSecret", webhookSecret);
+    logger.info("GitHub App configuration", { appId, privateKey: privateKey ? "***" : undefined, webhookSecret: webhookSecret ? "***" : undefined });
     if (!appId || !privateKey || !webhookSecret) {
       throw new Error(
         "GitHub App ID, Private Key, or Webhook Secret is not configured.",

@@ -232,7 +232,7 @@ export async function classifyMessage(
       }
     } catch (error) {
       // Log warning but continue without issue
-      console.warn("GitHub issue creation failed (continuing without issue):", error);
+      logger.warn("GitHub issue creation failed (continuing without issue)", { error });
       // Use a dummy issue ID of 0 to indicate no real issue
       githubIssueId = 0;
     }

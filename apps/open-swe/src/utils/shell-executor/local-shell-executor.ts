@@ -29,7 +29,7 @@ export class LocalShellExecutor {
     // Convert Daytona-style paths to local Windows paths if needed
     let cwd = workdir || this.workingDirectory;
     if (process.platform === 'win32' && cwd.startsWith('/home/daytona/')) {
-      const match = cwd.match(/^\/home\/daytona\/([^\/]+)/);
+      const match = cwd.match(/^\/home\/daytona\/([^/]+)/);
       const projectName = match ? match[1] : 'default-project';
       cwd = convertDaytonaPathToLocal(cwd, projectName);
       logger.info(`Converted Daytona path to Windows path`, { 
@@ -187,7 +187,7 @@ export class LocalShellExecutor {
       // Try to run a simple WSL command to check if it's available
       execSync('wsl --status', { stdio: 'ignore' });
       return true;
-    } catch (error) {
+    } catch (_error) {
       logger.warn("WSL2 is not available or not installed");
       return false;
     }

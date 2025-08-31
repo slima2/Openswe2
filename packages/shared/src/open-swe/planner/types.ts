@@ -103,6 +103,12 @@ export const PlannerGraphStateObj = MessagesZodState.extend({
       fn: (_state, update) => update,
     },
   }),
+  preflightPassed: withLangGraph(z.custom<boolean>().optional(), {
+    reducer: {
+      schema: z.custom<boolean>().optional(),
+      fn: (_state, update) => update,
+    },
+  }),
   tokenData: withLangGraph(z.custom<ModelTokenData[]>().optional(), {
     reducer: {
       schema: z.custom<ModelTokenData[]>().optional(),

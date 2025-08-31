@@ -46,6 +46,12 @@ export async function takeActions(
   state: PlannerGraphState,
   config: GraphConfig,
 ): Promise<Command> {
+  // Preflight validation: Check if environment is ready
+  if (state.preflightPassed === false) {
+    logger.error("Preflight checks failed - environment not ready for tool execution");
+    throw new Error("Environment preflight checks failed. Cannot execute tools until basic environment functionality is verified.");
+  }
+
   const { messages } = state;
   const lastMessage = messages[messages.length - 1];
 

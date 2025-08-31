@@ -1,5 +1,5 @@
 import { join, dirname } from "path";
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync } from "fs";
 import { tool } from "@langchain/core/tools";
 import { GraphState, GraphConfig } from "@open-swe/shared/open-swe/types";
 import { createLogger, LogLevel } from "../../utils/logger.js";
@@ -46,17 +46,26 @@ export function createTextEditorTool(
         if (localMode) {
           // Local mode: use Node.js file operations directly
 
-                  // Convert Daytona path to local Windows path
-        let filePath: string;
-        if (path.startsWith("/home/daytona/")) {
-          // Extract project name from path
-          const match = path.match(/^\/home\/daytona\/([^\/]+)/);
-          const projectName = match ? match[1] : "default-project";
-          filePath = convertDaytonaPathToLocal(path, projectName);
-        } else {
-          // Use path as-is if it's already a local path
-          filePath = path.includes(':') ? path : join(workDir, path);
-        }
+          // Convert Daytona path to local Windows path
+          let filePath: string;
+          if (path.startsWith("/home/daytona/")) {
+            // Extract project name from path
+            const match = path.match(/^\/home\/daytona\/([^/]+)/);
+            const projectName = match ? match[1] : "default-project";
+            filePath = convertDaytonaPathToLocal(path, projectName);
+          } else {
+            // Use path as-is if it's already a local path
+            filePath = path.includes(':') ? path : join(workDir, path);
+          }
+
+          // Check if path is a directory and handle appropriately
+          if (existsSync(filePath)) {
+            const stats = statSync(filePath);
+            if (stats.isDirectory()) {
+              // If it's a directory, provide a helpful error message
+              throw new Error(`Cannot perform '${command}' operation on directory: ${path}. Use 'ls' or 'tree' command to list directory contents instead.`);
+            }
+          }
 
           switch (command) {
             case "view": {

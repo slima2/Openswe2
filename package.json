@@ -8,6 +8,8 @@
   ],
   "scripts": {
     "dev": "turbo dev",
+    "dev:agent": "node yarn.js workspace @open-swe/agent dev",
+    "dev:web": "node yarn.js workspace @open-swe/web dev",
     "build": "turbo build",
     "turbo:command": "turbo",
     "format": "turbo format",

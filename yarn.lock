@@ -4167,6 +4167,7 @@ __metadata:
     ink: ^6.0.1
     prettier: ^3.5.2
     react: ^19.1.0
+    rimraf: ^5.0.5
     tsx: ^4.20.3
     typescript: ^5.8.3
     uuid: ^10.0.0
@@ -4207,6 +4208,7 @@ __metadata:
     jest: ^29.7.0
     jsonwebtoken: ^9.0.2
     prettier: ^3.5.2
+    rimraf: ^5.0.5
     ts-jest: ^29.1.0
     typescript: ~5.7.2
     typescript-eslint: ^8.22.0
@@ -11710,7 +11712,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^10.2.2":
+"glob@npm:^10.2.2, glob@npm:^10.3.7":
   version: 10.4.5
   resolution: "glob@npm:10.4.5"
   dependencies:
@@ -17947,6 +17949,17 @@ __metadata:
   version: 1.1.0
   resolution: "reusify@npm:1.1.0"
   checksum: 64cb3142ac5e9ad689aca289585cb41d22521f4571f73e9488af39f6b1bd62f0cbb3d65e2ecc768ec6494052523f473f1eb4b55c3e9014b3590c17fc6a03e22a
+  languageName: node
+  linkType: hard
+
+"rimraf@npm:^5.0.5":
+  version: 5.0.10
+  resolution: "rimraf@npm:5.0.10"
+  dependencies:
+    glob: ^10.3.7
+  bin:
+    rimraf: dist/esm/bin.mjs
+  checksum: 50e27388dd2b3fa6677385fc1e2966e9157c89c86853b96d02e6915663a96b7ff4d590e14f6f70e90f9b554093aa5dbc05ac3012876be558c06a65437337bc05
   languageName: node
   linkType: hard
 

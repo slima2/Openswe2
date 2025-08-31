@@ -32,7 +32,7 @@ export function createViewTool(
         // Extract project name from path if it contains Daytona-style paths
         let projectName = "default-project";
         if (path && path.startsWith("/home/daytona/")) {
-          const match = path.match(/^\/home\/daytona\/([^\/]+)/);
+          const match = path.match(/^\/home\/daytona\/([^/]+)/);
           if (match) {
             projectName = match[1];
           }
