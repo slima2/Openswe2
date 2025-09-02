@@ -120,10 +120,7 @@ export function DefaultView({ threads, threadsLoading }: DefaultViewProps) {
       <div className="border-border bg-card border-b px-4 py-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <GPTfyLogoSVG
-              width={120}
-              height={18}
-            />
+            {/* Logo removed from header */}
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -144,6 +141,20 @@ export function DefaultView({ threads, threadsLoading }: DefaultViewProps) {
           <GitHubInstallationBanner />
           <ApiKeyBanner />
           <IssuesRequiredBanner />
+          
+                           {/* Large Centered Logo */}
+                 <div className="flex justify-center py-12">
+                   <div className="text-center">
+                     <GPTfyLogoSVG
+                       width={350}
+                       height={105}
+                       className="mx-auto mb-6 drop-shadow-lg"
+                     />
+                     <p className="text-muted-foreground text-base font-medium">
+                       AI-Powered Software Engineering Assistant
+                     </p>
+                   </div>
+                 </div>
           {/* Terminal Chat Input */}
           <Card
             className={cn(
