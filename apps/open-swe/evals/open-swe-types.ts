@@ -92,12 +92,64 @@ export interface MyPyResult {
   issues: string[];
 }
 
+/**
+ * Return type for TypeScript compilation check
+ */
+export interface TypeScriptResult {
+  tsScore: number;
+  error: Error | null;
+  issues: string[];
+}
+
+/**
+ * Return type for ESLint check
+ */
+export interface ESLintResult {
+  eslintScore: number;
+  error: Error | null;
+  issues: string[];
+}
+
+/**
+ * Return type for npm build check
+ */
+export interface BuildResult {
+  buildScore: number;
+  error: Error | null;
+  issues: string[];
+}
+
+/**
+ * Return type for dependency check
+ */
+export interface DependencyResult {
+  depScore: number;
+  error: Error | null;
+  issues: string[];
+}
+
 export interface CodeTestDetails {
   ruff: {
     issues: RuffIssue[];
     error: Error | null;
   };
   mypy: {
+    issues: string[];
+    error: Error | null;
+  };
+  typescript: {
+    issues: string[];
+    error: Error | null;
+  };
+  eslint: {
+    issues: string[];
+    error: Error | null;
+  };
+  build: {
+    issues: string[];
+    error: Error | null;
+  };
+  dependencies: {
     issues: string[];
     error: Error | null;
   };

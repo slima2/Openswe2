@@ -8,7 +8,7 @@ import { TargetRepository } from "@open-swe/shared/open-swe/types";
 import { cloneRepo } from "../src/utils/github/git.js";
 import { getRepoAbsolutePath } from "@open-swe/shared/git";
 import { SimpleEvaluationResult } from "langsmith/vitest";
-import { runRuffLint, runMyPyTypeCheck } from "./tests.js";
+import { runRuffLint, runMyPyTypeCheck, runTypeScriptCheck, runESLintCheck, runNpmBuildCheck, checkMissingDependencies } from "./tests.js";
 import { setupEnv, ENV_CONSTANTS } from "../src/utils/env-setup.js";
 
 const logger = createLogger(LogLevel.INFO, "Evaluator ");
@@ -17,21 +17,37 @@ const logger = createLogger(LogLevel.INFO, "Evaluator ");
 const { RUN_PYTHON_IN_VENV } = ENV_CONSTANTS;
 
 /**
- * Runs ruff and mypy analysis on all Python files in the repository
+ * Runs comprehensive code analysis on the repository (Python + JavaScript/TypeScript)
  */
 async function runCodeTests(
   sandbox: Sandbox,
   absoluteRepoDir: string,
-): Promise<{ ruffScore: number; mypyScore: number; details: CodeTestDetails }> {
-  logger.info("Running code analysis on all Python files in repository");
+): Promise<{ 
+  ruffScore: number; 
+  mypyScore: number; 
+  tsScore: number;
+  eslintScore: number;
+  buildScore: number;
+  depScore: number;
+  details: CodeTestDetails 
+}> {
+  logger.info("Running comprehensive code analysis on repository");
 
   const testResults: {
     ruffScore: number;
     mypyScore: number;
+    tsScore: number;
+    eslintScore: number;
+    buildScore: number;
+    depScore: number;
     details: CodeTestDetails;
   } = {
     ruffScore: 0,
     mypyScore: 0,
+    tsScore: 0,
+    eslintScore: 0,
+    buildScore: 0,
+    depScore: 0,
     details: {
       ruff: {
         issues: [],
@@ -41,9 +57,103 @@ async function runCodeTests(
         issues: [],
         error: null,
       },
+      typescript: {
+        issues: [],
+        error: null,
+      },
+      eslint: {
+        issues: [],
+        error: null,
+      },
+      build: {
+        issues: [],
+        error: null,
+      },
+      dependencies: {
+        issues: [],
+        error: null,
+      },
     },
   };
 
+  // Check if package.json exists to determine if this is a JS/TS project
+  const packageJsonCheck = await sandbox.process.executeCommand(
+    "test -f package.json && echo 'exists' || echo 'not_found'",
+    absoluteRepoDir,
+    undefined,
+    30,
+  );
+
+  const isJSProject = packageJsonCheck.result?.includes("exists");
+
+  if (isJSProject) {
+    logger.info("Detected JavaScript/TypeScript project, running JS/TS validations...");
+    
+    // Install dependencies first
+    await sandbox.process.executeCommand(
+      "npm install",
+      absoluteRepoDir,
+      undefined,
+      TIMEOUT_SEC * 2,
+    );
+
+    // Run JS/TS validations in parallel
+    const [tsCheck, eslintCheck, buildCheck, depsCheck] = await Promise.all([
+      runTypeScriptCheck(sandbox, {
+        command: "npx tsc --noEmit",
+        workingDir: absoluteRepoDir,
+        env: undefined,
+        timeoutSec: TIMEOUT_SEC,
+      }),
+      runESLintCheck(sandbox, {
+        command: "npm run lint || npx eslint . --ext .ts,.tsx,.js,.jsx",
+        workingDir: absoluteRepoDir,
+        env: undefined,
+        timeoutSec: TIMEOUT_SEC,
+      }),
+      runNpmBuildCheck(sandbox, {
+        command: "npm run build",
+        workingDir: absoluteRepoDir,
+        env: undefined,
+        timeoutSec: TIMEOUT_SEC * 2,
+      }),
+      checkMissingDependencies(sandbox, {
+        command: "echo 'dependency check'",
+        workingDir: absoluteRepoDir,
+        env: undefined,
+        timeoutSec: TIMEOUT_SEC,
+      }),
+    ]);
+
+    // Update JS/TS results
+    Object.assign(testResults, {
+      tsScore: tsCheck.tsScore,
+      eslintScore: eslintCheck.eslintScore,
+      buildScore: buildCheck.buildScore,
+      depScore: depsCheck.depScore,
+      details: {
+        ...testResults.details,
+        typescript: {
+          issues: tsCheck.issues,
+          error: tsCheck.error,
+        },
+        eslint: {
+          issues: eslintCheck.issues,
+          error: eslintCheck.error,
+        },
+        build: {
+          issues: buildCheck.issues,
+          error: buildCheck.error,
+        },
+        dependencies: {
+          issues: depsCheck.issues,
+          error: depsCheck.error,
+        },
+      },
+    });
+  }
+
+  // Always run Python validations
   const [ruffLint, mypyCheck] = await Promise.all([
     runRuffLint(sandbox, {
       command: `${RUN_PYTHON_IN_VENV} -m ruff check . --output-format=json`,
@@ -59,10 +169,12 @@ async function runCodeTests(
     }),
   ]);
 
+  // Update Python results
   Object.assign(testResults, {
     ruffScore: ruffLint.ruffScore,
     mypyScore: mypyCheck.mypyScore,
     details: {
+      ...testResults.details,
       ruff: {
         issues: ruffLint.issues,
         error: ruffLint.error,
@@ -77,8 +189,16 @@ async function runCodeTests(
   logger.info("Code tests completed", {
     ruffScore: testResults.ruffScore,
     mypyScore: testResults.mypyScore,
+    tsScore: testResults.tsScore,
+    eslintScore: testResults.eslintScore,
+    buildScore: testResults.buildScore,
+    depScore: testResults.depScore,
     ruffIssues: testResults.details.ruff.issues.length,
     mypyIssues: testResults.details.mypy.issues.length,
+    tsIssues: testResults.details.typescript.issues.length,
+    eslintIssues: testResults.details.eslint.issues.length,
+    buildIssues: testResults.details.build.issues.length,
+    depsIssues: testResults.details.dependencies.issues.length,
   });
 
   return testResults;
@@ -133,12 +253,18 @@ export async function evaluator(inputs: {
 
     const analysisResult = await runCodeTests(sandbox, absoluteRepoDir);
 
-    const overallScore = analysisResult.ruffScore + analysisResult.mypyScore;
+    const overallScore = analysisResult.ruffScore + analysisResult.mypyScore + 
+                         analysisResult.tsScore + analysisResult.eslintScore + 
+                         analysisResult.buildScore + analysisResult.depScore;
 
     logger.info("Evaluation completed", {
       overallScore,
       ruffScore: analysisResult.ruffScore,
       mypyScore: analysisResult.mypyScore,
+      tsScore: analysisResult.tsScore,
+      eslintScore: analysisResult.eslintScore,
+      buildScore: analysisResult.buildScore,
+      depScore: analysisResult.depScore,
       repo: openSWEInputs.repo,
       originalBranch: openSWEInputs.branch,
       solutionBranch,
@@ -156,6 +282,22 @@ export async function evaluator(inputs: {
       {
         key: "mypy-score",
         score: analysisResult.mypyScore,
+      },
+      {
+        key: "typescript-score",
+        score: analysisResult.tsScore,
+      },
+      {
+        key: "eslint-score",
+        score: analysisResult.eslintScore,
+      },
+      {
+        key: "build-score",
+        score: analysisResult.buildScore,
+      },
+      {
+        key: "dependency-score",
+        score: analysisResult.depScore,
       },
     ];
   } catch (error) {

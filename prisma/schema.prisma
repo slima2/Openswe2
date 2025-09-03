@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  email       String   @unique
+  name        String
+  role        String   @default("user")
+  department  String
+  isActive    Boolean  @default(true)
+  ldapSync    Boolean  @default(false)
+  lastLoginAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  requests    Request[]
+  approvals   Approval[]
+  auditLogs   AuditLog[]
+
+  @@map("users")
+}
+
+model Material {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  name          String
+  description   String?
+  category      String
+  unitOfMeasure String
+  unitPrice     Decimal  @db.Decimal(10, 2)
+  stockQuantity Int      @default(0)
+  minStockLevel Int      @default(0)
+  maxStockLevel Int?
+  supplierInfo  Json?
+  specifications Json?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  requests Request[]
+
+  @@map("materials")
+}
+
+model Request {
+  id              String   @id @default(cuid())
+  userId          String
+  materialId      String
+  quantity        Int
+  totalAmount     Decimal  @db.Decimal(10, 2)
+  costCenter      String
+  requiredDate    DateTime
+  justification   String
+  priority        String   @default("normal")
+  status          String   @default("draft")
+  isDraft         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id])
+  material  Material   @relation(fields: [materialId], references: [id])
+  approvals Approval[]
+
+  @@map("requests")
+}
+
+model Approval {
+  id        String   @id @default(cuid())
+  requestId String
+  userId    String
+  status    String   @default("pending")
+  comments  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  request Request @relation(fields: [requestId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@map("approvals")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  entityType String
+  entityId   String?
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}

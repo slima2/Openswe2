@@ -31,7 +31,7 @@ import { useState, useMemo } from "react";
 import { threadsToMetadata } from "@/lib/thread-utils";
 import { Settings, BookOpen } from "lucide-react";
 import NextLink from "next/link";
-import { GPTfyLogoSVG } from "../icons/gptfy";
+import { GPTfyLogo } from "../icons/gptfy-logo";
 
 function OpenSettingsButton() {
   return (
@@ -145,7 +145,7 @@ export function DefaultView({ threads, threadsLoading }: DefaultViewProps) {
                            {/* Large Centered Logo */}
                  <div className="flex justify-center py-12">
                    <div className="text-center">
-                     <GPTfyLogoSVG
+                     <GPTfyLogo
                        width={350}
                        height={105}
                        className="mx-auto mb-6 drop-shadow-lg"
