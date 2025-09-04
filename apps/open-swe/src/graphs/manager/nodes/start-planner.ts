@@ -76,7 +76,7 @@ export async function startPlanner(
       {
         input: runInput,
         config: {
-          recursion_limit: 400,
+          recursion_limit: 1000,
           configurable: {
             ...getCustomConfigurableFields(config),
             ...(isLocalMode(config) && {

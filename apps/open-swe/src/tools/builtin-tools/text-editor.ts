@@ -106,7 +106,11 @@ export function createTextEditorTool(
             }
             case "create": {
               if (!file_text) {
-                throw new Error("create command requires file_text parameter");
+                throw new Error(
+                  `create command requires file_text parameter. ` +
+                  `Usage: {"command": "create", "path": "${path}", "file_text": "your_file_content_here"}. ` +
+                  `Please provide the complete file content in the file_text parameter.`
+                );
               }
               // Use Node.js file system to create file
               try {

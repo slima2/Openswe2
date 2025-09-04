@@ -177,7 +177,7 @@ webhooks.on("issues.labeled", async ({ payload }) => {
     };
     // Create config object with Claude Opus 4.1 model configuration for max labels
     const config: Record<string, any> = {
-      recursion_limit: 400,
+      recursion_limit: 1000,
     };
 
     if (isMaxLabel) {

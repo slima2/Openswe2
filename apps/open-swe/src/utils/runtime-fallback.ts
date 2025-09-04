@@ -19,6 +19,7 @@ import { BindToolsInput } from "@langchain/core/language_models/chat_models";
 import { getMessageContentString } from "@open-swe/shared/messages";
 import { getConfig } from "@langchain/langgraph";
 import { MODELS_NO_PARALLEL_TOOL_CALLING } from "./llms/load-model.js";
+import { createProviderAdapter, ProviderContextAdapter } from "./llms/provider-adapters.js";
 
 const logger = createLogger(LogLevel.DEBUG, "FallbackRunnable");
 
@@ -163,9 +164,34 @@ export class FallbackRunnable<
           runnableToUse = runnableToUse.withConfig(config);
         }
 
+        // Adaptar contexto según el proveedor
+        const providerAdapter = createProviderAdapter(modelConfig.provider);
+        const adaptedInput = this.adaptInputForProvider(input, providerAdapter);
+        const adaptedTools = this.adaptToolsForProvider(toolsToUse, providerAdapter);
+
+        // Re-bind tools si es necesario
+        if (adaptedTools && adaptedTools.tools.length !== toolsToUse?.tools.length) {
+          if ("bindTools" in runnableToUse && runnableToUse.bindTools) {
+            const supportsParallelToolCall =
+              !MODELS_NO_PARALLEL_TOOL_CALLING.some(
+                (modelName) => modelKey === modelName,
+              );
+
+            const kwargs = { ...adaptedTools.kwargs };
+            if (!supportsParallelToolCall && "parallel_tool_calls" in kwargs) {
+              delete kwargs.parallel_tool_calls;
+            }
+
+            runnableToUse = (runnableToUse as ConfigurableModel).bindTools(
+              adaptedTools.tools,
+              kwargs,
+            );
+          }
+        }
+
         const result = await runnableToUse.invoke(
           useProviderMessages(
-            input,
+            adaptedInput,
             this.providerMessages,
             modelConfig.provider,
           ),
@@ -279,5 +305,27 @@ export class FallbackRunnable<
     }
 
     return null;
+  }
+
+  private adaptInputForProvider(
+    input: BaseLanguageModelInput,
+    adapter: ProviderContextAdapter
+  ): BaseLanguageModelInput {
+    if (Array.isArray(input)) {
+      return adapter.adaptContext(input);
+    }
+    return input;
+  }
+
+  private adaptToolsForProvider(
+    tools: ExtractedTools | null,
+    adapter: ProviderContextAdapter
+  ): ExtractedTools | null {
+    if (!tools) return null;
+    
+    return {
+      ...tools,
+      tools: adapter.adaptTools(tools.tools),
+    };
   }
 }

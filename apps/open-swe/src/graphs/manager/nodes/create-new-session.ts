@@ -114,7 +114,7 @@ ${ISSUE_CONTENT_CLOSE_TAG}`,
       goto: "start-planner",
     },
     config: {
-      recursion_limit: 400,
+      recursion_limit: 1000,
       configurable: getCustomConfigurableFields(config),
     },
     ifNotExists: "create",

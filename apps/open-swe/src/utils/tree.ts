@@ -137,14 +137,58 @@ async function getCodebaseTreeLocal(config: GraphConfig): Promise<string> {
       timeout: TIMEOUT_SEC,
     });
 
+    // If git ls-files fails, try to initialize Git repository
     if (response.exitCode !== 0) {
-      logger.error("Failed to generate tree in local mode", {
+      logger.warn("git ls-files failed, attempting to initialize Git repository", {
         exitCode: response.exitCode,
         result: response.result,
       });
-      throw new Error(
-        `Failed to generate tree in local mode: ${response.result}`,
-      );
+      
+      // Try to initialize Git repository
+      const initResult = await initializeGitRepository(executor, isWindows);
+      
+      if (initResult.success) {
+        // Retry git ls-files after initialization
+        const retryResponse = await executor.executeCommand({
+          command,
+          timeout: TIMEOUT_SEC,
+        });
+        
+        if (retryResponse.exitCode === 0) {
+          // Format the output if on Windows
+          if (isWindows && retryResponse.result) {
+            const files = retryResponse.result.split('\n').filter(f => f.trim());
+            const tree = formatFilesAsTree(files);
+            return tree;
+          }
+          return retryResponse.result;
+        }
+      }
+      
+      // If Git initialization fails, try alternative approaches
+      logger.warn("Git initialization failed, trying alternative file listing", {
+        initResult,
+      });
+      
+      // Try using find command as fallback
+      const fallbackCommand = isWindows 
+        ? `find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.json" -o -name "*.md" | head -50`
+        : `find . -type f \\( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.json" -o -name "*.md" \\) | head -50`;
+      
+      const fallbackResponse = await executor.executeCommand({
+        command: fallbackCommand,
+        timeout: TIMEOUT_SEC,
+      });
+      
+      if (fallbackResponse.exitCode === 0 && fallbackResponse.result) {
+        const files = fallbackResponse.result.split('\n').filter(f => f.trim());
+        const tree = formatFilesAsTree(files);
+        return tree;
+      }
+      
+      // If all else fails, return a simple directory structure
+      logger.warn("All file listing methods failed, returning basic structure");
+      return "Local project directory\n├── (File listing unavailable)\n└── (Using local mode)";
     }
 
     // Format the output if on Windows (simple file list to tree-like structure)
@@ -165,6 +209,85 @@ async function getCodebaseTreeLocal(config: GraphConfig): Promise<string> {
           }
         : { error: e }),
     });
-    return FAILED_TO_GENERATE_TREE_MESSAGE;
+    // Return a fallback message instead of throwing
+    return "Local project directory\n├── (File listing unavailable)\n└── (Using local mode)";
+  }
+}
+
+/**
+ * Initialize Git repository automatically
+ */
+async function initializeGitRepository(executor: any, isWindows: boolean): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Step 1: Check if we're in a Git repository
+    const checkGitResult = await executor.executeCommand({
+      command: 'git status',
+      timeout: 10,
+    });
+
+    // If git status succeeds, we're already in a Git repository
+    if (checkGitResult.exitCode === 0) {
+      logger.debug("Already in a Git repository");
+      return { success: true };
+    }
+
+    // Step 2: Initialize Git repository
+    logger.info("Initializing Git repository");
+    const initResult = await executor.executeCommand({
+      command: 'git init',
+      timeout: 10,
+    });
+
+    if (initResult.exitCode !== 0) {
+      return { success: false, error: `Git init failed: ${initResult.result}` };
+    }
+
+    // Step 3: Configure Git user (required for commits)
+    logger.info("Configuring Git user");
+    const configUserResult = await executor.executeCommand({
+      command: 'git config user.email "gptfy@gptfy.biz" && git config user.name "GPTfy"',
+      timeout: 10,
+    });
+
+    if (configUserResult.exitCode !== 0) {
+      logger.warn("Git user configuration failed, but continuing", {
+        error: configUserResult.result,
+      });
+    }
+
+    // Step 4: Add all files to Git
+    logger.info("Adding files to Git repository");
+    const addResult = await executor.executeCommand({
+      command: 'git add .',
+      timeout: 30,
+    });
+
+    if (addResult.exitCode !== 0) {
+      logger.warn("Git add failed, but continuing", {
+        error: addResult.result,
+      });
+    }
+
+    // Step 5: Create initial commit
+    logger.info("Creating initial commit");
+    const commitResult = await executor.executeCommand({
+      command: 'git commit -m "Initial commit by GPTfy"',
+      timeout: 30,
+    });
+
+    if (commitResult.exitCode !== 0) {
+      logger.warn("Git commit failed, but repository is initialized", {
+        error: commitResult.result,
+      });
+      // Even if commit fails, the repository is initialized and git ls-files should work
+      return { success: true };
+    }
+
+    logger.info("Git repository initialized successfully");
+    return { success: true };
+
+  } catch (error) {
+    logger.error("Git initialization failed", { error });
+    return { success: false, error: String(error) };
   }
 }

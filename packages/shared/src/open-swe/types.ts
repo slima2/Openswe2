@@ -407,7 +407,7 @@ export const GraphConfigurationMetadata: {
   routerModelName: {
     x_open_swe_ui_config: {
       type: "select",
-      default: "anthropic:claude-3-5-haiku-latest",
+      default: "anthropic:claude-opus-4-1",
       description:
         "The model to use for routing tasks, and other simple generations. This model should be good at tool calling/structured output.",
       options: MODEL_OPTIONS,

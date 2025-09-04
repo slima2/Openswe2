@@ -80,7 +80,7 @@ export function HumanMessage({
           };
         },
         config: {
-          recursion_limit: 400,
+          recursion_limit: 1000,
         },
       },
     );

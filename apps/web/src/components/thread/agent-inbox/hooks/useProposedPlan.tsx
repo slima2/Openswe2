@@ -47,7 +47,7 @@ export function useProposedPlan(
           resume,
         },
         config: {
-          recursion_limit: 400,
+          recursion_limit: 1000,
         },
         streamResumable: true,
       },
@@ -68,7 +68,7 @@ export function useProposedPlan(
           resume,
         },
         config: {
-          recursion_limit: 400,
+          recursion_limit: 1000,
         },
         streamResumable: true,
       },

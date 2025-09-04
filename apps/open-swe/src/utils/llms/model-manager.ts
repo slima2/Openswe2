@@ -44,9 +44,9 @@ export enum CircuitState {
 }
 
 export const PROVIDER_FALLBACK_ORDER = [
-  "openai",
-  "anthropic",
-  "google-genai",
+  "anthropic",    // Primero Anthropic Claude 4.1 Opus (mejor funcionamiento)
+  "openai",       // Segundo OpenAI GPT-5 (400K tokens)
+  "google-genai", // Tercero Google Gemini (no programa bien)
 ] as const;
 export type Provider = (typeof PROVIDER_FALLBACK_ORDER)[number];
 
@@ -174,6 +174,9 @@ export class ModelManager {
     let finalMaxTokens = maxTokens ?? 10_000;
     if (modelName.includes("claude-3-5-haiku")) {
       finalMaxTokens = finalMaxTokens > 8_192 ? 8_192 : finalMaxTokens;
+    } else if (modelName.includes("claude-opus-4-1")) {
+      // Claude 4.1 Opus puede manejar hasta 32K tokens de salida
+      finalMaxTokens = finalMaxTokens > 32_000 ? 32_000 : finalMaxTokens;
     }
 
     const apiKey = this.getUserApiKey(graphConfig, provider);
@@ -382,7 +385,7 @@ export class ModelManager {
         [LLMTask.PLANNER]: "claude-sonnet-4-0",
         [LLMTask.PROGRAMMER]: "claude-sonnet-4-0",
         [LLMTask.REVIEWER]: "claude-sonnet-4-0",
-        [LLMTask.ROUTER]: "claude-3-5-haiku-latest",
+        [LLMTask.ROUTER]: "claude-opus-4-1",
         [LLMTask.SUMMARIZER]: "claude-sonnet-4-0",
       },
       "google-genai": {

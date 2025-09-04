@@ -161,7 +161,7 @@ export function TerminalInput({
           {
             input: runInput,
             config: {
-              recursion_limit: 400,
+              recursion_limit: 1000,
               configurable: {
                 ...defaultConfig,
                 [GITHUB_USER_LOGIN_HEADER]: user.login,

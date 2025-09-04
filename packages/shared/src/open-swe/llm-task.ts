@@ -41,11 +41,11 @@ export const TASK_TO_CONFIG_DEFAULTS_MAP = {
     temperature: 0,
   },
   [LLMTask.ROUTER]: {
-    modelName: "anthropic:claude-3-5-haiku-latest",
+    modelName: "anthropic:claude-opus-4-1",
     temperature: 0,
   },
   [LLMTask.SUMMARIZER]: {
-    modelName: "anthropic:claude-3-5-haiku-latest",
+    modelName: "anthropic:claude-opus-4-1",
     temperature: 0,
   },
 };

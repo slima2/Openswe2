@@ -376,7 +376,7 @@ export function AssistantMessage({
     const newRun = await thread.client.runs.create(threadId, assistantId, {
       command: { resume: humanResponse },
       config: {
-        recursion_limit: 400,
+        recursion_limit: 1000,
       },
       streamResumable: true,
       streamMode: OPEN_SWE_STREAM_MODE as StreamMode[],
