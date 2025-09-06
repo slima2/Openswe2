@@ -1,0 +1,24 @@
+{
+  "name": "open-swe-16gb",
+  "heap_limit_mb": 16384,
+  "warning_threshold_mb": 11200,
+  "critical_threshold_mb": 13600,
+  "monitoring": {
+    "interval_ms": 5000,
+    "enable_gc_trigger": true,
+    "enable_heap_snapshots": true
+  },
+  "cache_limits": {
+    "document_cache_mb": 250,
+    "string_limit_mb": 25,
+    "message_limit_mb": 35,
+    "max_messages": 200
+  },
+  "optimizations": {
+    "redacting_serde": true,
+    "memory_watchdog": true,
+    "use_workers": true,
+    "stream_json": true,
+    "large_codebase_mode": true
+  }
+}

@@ -56,9 +56,14 @@ export function createViewTool(
           // Convert Daytona path to local Windows path
           let localPath = path;
           if (path.startsWith("/home/daytona/")) {
-            const fullLocalPath = convertDaytonaPathToLocal(path, projectName);
-            // Get the relative path within the project
-            localPath = fullLocalPath.replace(workDir + (process.platform === 'win32' ? '\\' : '/'), '');
+            // Extract the relative path after /home/daytona/projectName/
+            const daytonaPrefix = `/home/daytona/${projectName}`;
+            if (path.startsWith(daytonaPrefix)) {
+              localPath = path.substring(daytonaPrefix.length + 1); // +1 for the trailing slash
+            } else {
+              // Just remove /home/daytona/ prefix
+              localPath = path.replace(/^\/home\/daytona\/[^/]+\/?/, '');
+            }
           }
           
           // If it's just the base path, list directory contents

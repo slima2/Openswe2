@@ -29,10 +29,7 @@ export async function processToolCallContent(
 
   if (toolCall.name === "search_document_for") {
     return {
-      content: truncateOutput(result, {
-        numStartCharacters: 20000,
-        numEndCharacters: 20000,
-      }),
+      content: truncateOutput(result), // No limits - full output as requested
     };
   } else if (higherContextLimitToolNames.includes(toolCall.name)) {
     const url = toolCall.args?.url || toolCall.args?.uri || toolCall.args?.path;
@@ -40,9 +37,10 @@ export async function processToolCallContent(
     const parsedUrl = parsedResult?.success ? parsedResult.url.href : undefined;
 
     // avoid generating TOC again if it's already in the cache
-    if (parsedUrl && state.documentCache[parsedUrl]) {
+    const cachedContent = parsedUrl ? state.documentCache.get(parsedUrl) : null;
+    if (cachedContent) {
       return {
-        content: state.documentCache[parsedUrl],
+        content: cachedContent,
       };
     }
 
@@ -54,14 +52,13 @@ export async function processToolCallContent(
       },
     );
 
-    const stateUpdates = parsedUrl
-      ? {
-          documentCache: {
-            ...state.documentCache,
-            [parsedUrl]: result,
-          },
-        }
-      : undefined;
+    let stateUpdates: any = undefined;
+    if (parsedUrl) {
+      state.documentCache.set(parsedUrl, result);
+      stateUpdates = {
+        documentCache: state.documentCache,
+      };
+    }
 
     return {
       content: processedContent,

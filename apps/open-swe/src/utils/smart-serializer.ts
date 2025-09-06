@@ -14,10 +14,10 @@ export interface SerializationConfig {
 }
 
 export const DEFAULT_SERIALIZATION_CONFIG: SerializationConfig = {
-  maxSizeBytes: 100 * 1024 * 1024, // 100MB (aumentado de 50MB)
-  compressionThreshold: 5 * 1024 * 1024, // 5MB (aumentado de 1MB)
+  maxSizeBytes: 200 * 1024 * 1024, // 200MB (aumentado para manejar resúmenes inteligentes)
+  compressionThreshold: 10 * 1024 * 1024, // 10MB (aumentado para trabajar mejor con contexto resumido)
   enableCompression: true,
-  chunkSize: 2 * 1024 * 1024, // 2MB chunks (aumentado de 1MB)
+  chunkSize: 5 * 1024 * 1024, // 5MB chunks (aumentado para mejor rendimiento)
 };
 
 export class SmartSerializer {

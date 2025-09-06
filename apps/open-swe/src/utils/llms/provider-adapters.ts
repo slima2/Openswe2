@@ -2,6 +2,7 @@ import { BaseMessage, BaseMessageLike } from "@langchain/core/messages";
 import { BindToolsInput } from "@langchain/core/language_models/chat_models";
 import { Provider } from "./model-manager.js";
 import { createLogger, LogLevel } from "../logger.js";
+import { IntelligentContextManager } from "../intelligent-context-manager.js";
 
 const logger = createLogger(LogLevel.DEBUG, "ProviderAdapters");
 
@@ -11,47 +12,61 @@ export interface ProviderContextConfig {
   maxToolOutputs: number;
   compressOldContext: boolean;
   truncateToolSchemas: boolean;
+  useIntelligentSummarization: boolean; // Nueva opción para resumen inteligente
 }
 
 export const PROVIDER_CONFIGS: Record<Provider, ProviderContextConfig> = {
+  "google-genai": {
+    maxTokens: 2000000,     // Gemini 2.5 Pro tiene 2M tokens (MÁXIMO)
+    maxMessages: 1000,      // Sin limitaciones - usar toda la ventana
+    maxToolOutputs: 500,    // Sin limitaciones - máximo posible
+    compressOldContext: false,  // NO comprimir - usar contexto completo
+    truncateToolSchemas: false, // NO truncar - tools completos
+    useIntelligentSummarization: true, // REACTIVADO - problemas corregidos
+  },
   "anthropic": {
     maxTokens: 200000,      // Claude 4.1 Opus tiene 200K tokens
-    maxMessages: 30,        // Más mensajes para Anthropic (mejor modelo)
-    maxToolOutputs: 20,     // Más outputs para Anthropic
-    compressOldContext: false,  // NO comprimir para Anthropic
-    truncateToolSchemas: false, // NO truncar tools para Anthropic
+    maxMessages: 100,       // Más mensajes que antes
+    maxToolOutputs: 50,     // Más outputs que antes
+    compressOldContext: false,  // NO comprimir
+    truncateToolSchemas: false, // NO truncar
+    useIntelligentSummarization: true, // REACTIVADO - problemas corregidos
   },
   "openai": {
     maxTokens: 400000,      // GPT-5 tiene 400K tokens en API
-    maxMessages: 35,        // Más mensajes para GPT-5
-    maxToolOutputs: 25,     // Más outputs para GPT-5
-    compressOldContext: false,
-    truncateToolSchemas: false,
-  },
-  "google-genai": {
-    maxTokens: 2000000,     // Gemini 2.5 Pro tiene 2M tokens
-    maxMessages: 50,        // Muchos mensajes para Google (pero último)
-    maxToolOutputs: 25,     // Outputs para Google
-    compressOldContext: false,  // NO comprimir para Google
-    truncateToolSchemas: false, // NO truncar tools para Google
+    maxMessages: 150,       // Más mensajes que antes
+    maxToolOutputs: 75,     // Más outputs que antes
+    compressOldContext: false,  // NO comprimir
+    truncateToolSchemas: false, // NO truncar
+    useIntelligentSummarization: true, // REACTIVADO - problemas corregidos
   },
 };
 
 export class ProviderContextAdapter {
   private provider: Provider;
   private config: ProviderContextConfig;
+  private intelligentManager: IntelligentContextManager;
 
   constructor(provider: Provider) {
     this.provider = provider;
     this.config = PROVIDER_CONFIGS[provider];
+    this.intelligentManager = new IntelligentContextManager();
   }
 
-  adaptContext(input: BaseMessageLike[]): BaseMessageLike[] {
+  async adaptContext(input: BaseMessageLike[]): Promise<BaseMessageLike[]> {
     logger.debug(`Adapting context for provider: ${this.provider}`, {
       originalLength: input.length,
       maxMessages: this.config.maxMessages,
+      useIntelligentSummarization: this.config.useIntelligentSummarization,
     });
 
+    // PRIORIDAD 1: Usar resumen inteligente basado en memoria si está habilitado
+    if (this.config.useIntelligentSummarization) {
+      logger.debug(`Using intelligent context summarization for provider: ${this.provider}`);
+      return await this.intelligentManager.adaptPrompt(input, this.provider);
+    }
+
+    // PRIORIDAD 2: Lógica original (fallback)
     // Si no necesitamos comprimir ni truncar, devolver input original
     if (!this.config.compressOldContext && !this.config.truncateToolSchemas) {
       logger.debug(`No adaptation needed for provider: ${this.provider}`);
@@ -76,7 +91,7 @@ export class ProviderContextAdapter {
     // Combinar system + recent
     const adaptedContext = [...systemMessages, ...recentMessages];
 
-    logger.debug(`Context adapted`, {
+    logger.debug(`Context adapted (fallback method)`, {
       provider: this.provider,
       originalLength: input.length,
       adaptedLength: adaptedContext.length,

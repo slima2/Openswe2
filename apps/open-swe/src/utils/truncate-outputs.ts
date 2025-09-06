@@ -6,17 +6,23 @@ export function truncateOutput(
   output: string,
   options?: {
     /**
-     * @default 2500
+     * @default Infinity - No truncation by default as requested by user
      */
     numStartCharacters?: number;
 
     /**
-     * @default 2500
+     * @default Infinity - No truncation by default as requested by user
      */
     numEndCharacters?: number;
   },
 ) {
-  const { numStartCharacters = 2500, numEndCharacters = 2500 } = options ?? {};
+  const { numStartCharacters = Infinity, numEndCharacters = Infinity } = options ?? {};
+
+  // If either limit is Infinity, return full output without truncation
+  if (numStartCharacters === Infinity || numEndCharacters === Infinity) {
+    logger.debug(`Output returned without truncation. Length: ${output.length} characters`);
+    return output;
+  }
 
   if (numStartCharacters < 0 || numEndCharacters < 0) {
     throw new Error("numStartCharacters and numEndCharacters must be >= 0");

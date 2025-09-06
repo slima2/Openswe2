@@ -166,7 +166,7 @@ export class FallbackRunnable<
 
         // Adaptar contexto según el proveedor
         const providerAdapter = createProviderAdapter(modelConfig.provider);
-        const adaptedInput = this.adaptInputForProvider(input, providerAdapter);
+        const adaptedInput = await this.adaptInputForProvider(input, providerAdapter);
         const adaptedTools = this.adaptToolsForProvider(toolsToUse, providerAdapter);
 
         // Re-bind tools si es necesario
@@ -200,8 +200,14 @@ export class FallbackRunnable<
         this.modelManager.recordSuccess(modelKey);
         return result;
       } catch (error) {
-        logger.warn(
+        logger.error(
           `${modelKey} failed: ${error instanceof Error ? error.message : String(error)}`,
+          {
+            provider: modelConfig.provider,
+            modelName: modelConfig.modelName,
+            errorType: error instanceof Error ? error.constructor.name : 'Unknown',
+            stack: error instanceof Error ? error.stack : undefined,
+          }
         );
         lastError = error instanceof Error ? error : new Error(String(error));
         this.modelManager.recordFailure(modelKey);
@@ -307,12 +313,12 @@ export class FallbackRunnable<
     return null;
   }
 
-  private adaptInputForProvider(
+  private async adaptInputForProvider(
     input: BaseLanguageModelInput,
     adapter: ProviderContextAdapter
-  ): BaseLanguageModelInput {
+  ): Promise<BaseLanguageModelInput> {
     if (Array.isArray(input)) {
-      return adapter.adaptContext(input);
+      return await adapter.adaptContext(input);
     }
     return input;
   }

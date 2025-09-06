@@ -37,7 +37,7 @@ export function createSearchDocumentForTool(
       const parsedUrl = urlParseResult.url?.href;
 
       try {
-        let documentContent = state.documentCache[parsedUrl];
+        let documentContent = state.documentCache.get(parsedUrl);
 
         if (!documentContent) {
           logger.info("Document not cached, fetching via FireCrawl", {
@@ -55,11 +55,9 @@ export function createSearchDocumentForTool(
           documentContent = docs.map((doc) => doc.pageContent).join("\n\n");
 
           if (state.documentCache) {
+            state.documentCache.set(parsedUrl, documentContent);
             const stateUpdates = {
-              documentCache: {
-                ...state.documentCache,
-                [parsedUrl]: documentContent,
-              },
+              documentCache: state.documentCache,
             };
             return { result: documentContent, status: "success", stateUpdates };
           }

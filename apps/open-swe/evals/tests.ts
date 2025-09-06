@@ -77,6 +77,9 @@ export const runRuffLint = async (
       error: error as Error,
       issues: [],
     };
+  }
+};
+
 /**
  * Run TypeScript compilation check and return score, error, and issues
  */
@@ -364,4 +367,4 @@ export const runMyPyTypeCheck = async (
       issues: [],
     };
   }
-};
+}

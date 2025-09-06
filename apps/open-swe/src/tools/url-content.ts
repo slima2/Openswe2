@@ -27,7 +27,7 @@ export function createGetURLContentTool(
       const parsedUrl = urlParseResult.url?.href;
 
       try {
-        let documentContent = state.documentCache[parsedUrl];
+        let documentContent = state.documentCache.get(parsedUrl);
 
         if (!documentContent) {
           logger.info("Document not cached, fetching via FireCrawl", {

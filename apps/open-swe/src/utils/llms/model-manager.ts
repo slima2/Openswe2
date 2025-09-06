@@ -44,9 +44,9 @@ export enum CircuitState {
 }
 
 export const PROVIDER_FALLBACK_ORDER = [
-  "anthropic",    // Primero Anthropic Claude 4.1 Opus (mejor funcionamiento)
-  "openai",       // Segundo OpenAI GPT-5 (400K tokens)
-  "google-genai", // Tercero Google Gemini (no programa bien)
+  "google-genai", // Primero Google Gemini (2M tokens - mayor ventana)
+  "anthropic",    // Segundo Anthropic Claude (200K tokens)
+  "openai",       // Tercero OpenAI (reactivado - problema era del contexto inteligente)
 ] as const;
 export type Provider = (typeof PROVIDER_FALLBACK_ORDER)[number];
 
@@ -185,6 +185,8 @@ export class ModelManager {
       modelProvider: provider,
       max_retries: MAX_RETRIES,
       ...(apiKey ? { apiKey } : {}),
+      // ✅ OPENAI: NO STREAMING para evitar error de verificación
+      ...(provider === "openai" ? { streaming: false } : {}),
       ...(thinkingModel && provider === "anthropic"
         ? {
             thinking: { budget_tokens: thinkingBudgetTokens, type: "enabled" },
@@ -204,6 +206,8 @@ export class ModelManager {
     logger.debug("Initializing model", {
       provider,
       modelName,
+      streaming: provider === "openai" ? false : "default",
+      finalMaxTokens,
     });
 
     return await initChatModel(modelName, modelOptions);
@@ -382,11 +386,11 @@ export class ModelManager {
   ): ModelLoadConfig | null {
     const defaultModels: Record<Provider, Record<LLMTask, string>> = {
       anthropic: {
-        [LLMTask.PLANNER]: "claude-sonnet-4-0",
-        [LLMTask.PROGRAMMER]: "claude-sonnet-4-0",
-        [LLMTask.REVIEWER]: "claude-sonnet-4-0",
+        [LLMTask.PLANNER]: "claude-opus-4-1",
+        [LLMTask.PROGRAMMER]: "claude-opus-4-1",
+        [LLMTask.REVIEWER]: "claude-opus-4-1",
         [LLMTask.ROUTER]: "claude-opus-4-1",
-        [LLMTask.SUMMARIZER]: "claude-sonnet-4-0",
+        [LLMTask.SUMMARIZER]: "claude-opus-4-1",
       },
       "google-genai": {
         [LLMTask.PLANNER]: "gemini-2.5-flash",

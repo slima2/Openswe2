@@ -149,10 +149,8 @@ export function DefaultView({ threads, threadsLoading }: DefaultViewProps) {
                        width={350}
                        height={105}
                        className="mx-auto mb-6 drop-shadow-lg"
+                       showTagline={false}
                      />
-                     <p className="text-muted-foreground text-base font-medium">
-                       AI-Powered Software Engineering Assistant
-                     </p>
                    </div>
                  </div>
           {/* Terminal Chat Input */}
