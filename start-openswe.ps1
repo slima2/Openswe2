@@ -1,5 +1,5 @@
-# Script para iniciar ambos servidores con npm
-Write-Host "🚀 Iniciando Open SWE completo con npm..." -ForegroundColor Green
+﻿# Script para iniciar ambos servidores
+Write-Host "Iniciando Open SWE completo..." -ForegroundColor Green
 
 # Iniciar Backend en una nueva ventana
 Write-Host "  --> Iniciando Backend..." -ForegroundColor Yellow
@@ -14,6 +14,6 @@ Write-Host "  --> Iniciando Frontend..." -ForegroundColor Yellow
 $frontendCommand = "Set-Location apps\web; npm run dev"
 Start-Process powershell -ArgumentList "-NoExit", "-Command", $frontendCommand -WindowStyle Normal
   
-Write-Host "✅ Servidores iniciados!" -ForegroundColor Green
-Write-Host "🌐 Frontend: http://localhost:3000" -ForegroundColor Cyan
-Write-Host "🔧 Backend: http://localhost:2024" -ForegroundColor Cyan
+Write-Host "Servidores iniciados correctamente" -ForegroundColor Green
+Write-Host "Frontend: http://localhost:3000" -ForegroundColor Cyan
+Write-Host "Backend: http://localhost:2024" -ForegroundColor Cyan

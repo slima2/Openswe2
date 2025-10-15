@@ -1,0 +1,37 @@
+# ============================================
+# COPIA ESTE CONTENIDO A:
+# apps\open-swe\.env
+# ============================================
+
+# Modo Local (sin Daytona - GRATIS)
+OPEN_SWE_LOCAL_MODE=true
+OPEN_SWE_PROJECT_PATH=D:\Dropbox\EDUCASTLE\OPENSWE2\open-swe-main
+
+# LangSmith (opcional)
+LANGCHAIN_PROJECT="default"
+LANGCHAIN_API_KEY=""
+LANGCHAIN_TRACING_V2="false"
+
+# LLM Provider - NECESITAS AL MENOS UNO DE ESTOS
+ANTHROPIC_API_KEY=""
+OPENAI_API_KEY=""
+
+# Infrastructure (NO necesario en modo local)
+DAYTONA_API_KEY=""
+
+# GitHub App - REEMPLAZA CON TUS VALORES REALES
+# Ve a: https://github.com/settings/apps
+GITHUB_APP_NAME="OpenSWE2"
+GITHUB_APP_ID="1831432"
+GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----
+PEGA_AQUI_TU_PRIVATE_KEY_COMPLETA
+-----END RSA PRIVATE KEY-----"
+GITHUB_WEBHOOK_SECRET="dummy-webhook-for-local-dev"
+
+# Server config
+PORT="2024"
+OPEN_SWE_APP_URL="http://localhost:3000"
+SECRETS_ENCRYPTION_KEY="8B6D8A9548531924EC59BA36DF9EA9FE8465C8E23E3C581A2E30CC05014B14A3"
+SKIP_CI_UNTIL_LAST_COMMIT="true"
+
+
