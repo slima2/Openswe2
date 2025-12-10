@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node start-moderate-16gb.js",
     "start:conservative": "node start-conservative-8gb.js",
-    "start:moderate": "node start-moderate-16gb.js", 
+    "start:moderate": "node start-moderate-16gb.js",
     "start:aggressive": "node start-aggressive-32gb.js",
     "build": "npm run build --workspaces",
     "dev": "npm run dev --workspaces",
@@ -14,5 +14,6 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

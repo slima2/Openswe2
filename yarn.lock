@@ -1339,13 +1339,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@epic-web/invariant@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@epic-web/invariant@npm:1.0.0"
-  checksum: 58e2029bd3362751f5afac2b3bdb6b4f6e38f888af7ee93a0d76e18c879586b130bf3b14588364fcf04a1423b5b917eacad5717d61224daac64350c7ae5fc95e
-  languageName: node
-  linkType: hard
-
 "@esbuild/aix-ppc64@npm:0.25.6":
   version: 0.25.6
   resolution: "@esbuild/aix-ppc64@npm:0.25.6"
@@ -3237,6 +3230,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@langchain/langgraph-sdk@npm:~0.0.98":
+  version: 0.0.112
+  resolution: "@langchain/langgraph-sdk@npm:0.0.112"
+  dependencies:
+    "@types/json-schema": ^7.0.15
+    p-queue: ^6.6.2
+    p-retry: 4
+    uuid: ^9.0.0
+  peerDependencies:
+    "@langchain/core": ">=0.2.31 <0.4.0"
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  peerDependenciesMeta:
+    "@langchain/core":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 9774f1dffb0f8fd35d57ce77c6531b09e590d4cc45adad785216d072c407c135ebd056a7720487405d6ba52396aac7c9c7ff32bb633d4491efa1cd614bb060b7
+  languageName: node
+  linkType: hard
+
 "@langchain/langgraph-ui@npm:0.0.47":
   version: 0.0.47
   resolution: "@langchain/langgraph-ui@npm:0.0.47"
@@ -4241,6 +4257,7 @@ __metadata:
     "@radix-ui/react-hover-card": ^1.1.14
     "@radix-ui/react-label": ^2.1.2
     "@radix-ui/react-popover": ^1.1.14
+    "@radix-ui/react-progress": ^1.1.8
     "@radix-ui/react-scroll-area": ^1.2.9
     "@radix-ui/react-select": ^2.2.5
     "@radix-ui/react-separator": ^1.1.2
@@ -4257,6 +4274,7 @@ __metadata:
     "@types/react-dom": ^19.0.3
     "@types/react-syntax-highlighter": ^15.5.13
     "@types/uuid": ^10.0.0
+    "@types/xlsx": ^0.0.36
     autoprefixer: ^10.4.20
     class-variance-authority: ^0.7.1
     clsx: ^2.1.1
@@ -4301,6 +4319,7 @@ __metadata:
     typescript-eslint: ^8.22.0
     use-stick-to-bottom: ^1.0.46
     uuid: ^11.1.0
+    xlsx: ^0.18.5
     zod: ^3.25.32
     zustand: ^5.0.5
   languageName: unknown
@@ -4623,6 +4642,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@radix-ui/react-context@npm:1.1.3":
+  version: 1.1.3
+  resolution: "@radix-ui/react-context@npm:1.1.3"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: d0df606f54044db8d1ce65206b36dcdd6a4e44e0bfbd97011c872d5d5fd00b9f32f4709f39e8b4b8a5913977358e1d5d7e44b3b6f42a4aa8c54aa0e436715e32
+  languageName: node
+  linkType: hard
+
 "@radix-ui/react-dialog@npm:1.1.14, @radix-ui/react-dialog@npm:^1.1.14, @radix-ui/react-dialog@npm:^1.1.6":
   version: 1.1.14
   resolution: "@radix-ui/react-dialog@npm:1.1.14"
@@ -4906,6 +4938,45 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@radix-ui/react-primitive@npm:2.1.4":
+  version: 2.1.4
+  resolution: "@radix-ui/react-primitive@npm:2.1.4"
+  dependencies:
+    "@radix-ui/react-slot": 1.2.4
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 8b4cf865b4d4d135c9c6768856fdad0f62cbe43a2819471eb682061d2076222c3368ae0b771516426b264afcaf0a0032943408b3a789cbb77273152dd4a06d05
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-progress@npm:^1.1.8":
+  version: 1.1.8
+  resolution: "@radix-ui/react-progress@npm:1.1.8"
+  dependencies:
+    "@radix-ui/react-context": 1.1.3
+    "@radix-ui/react-primitive": 2.1.4
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: a55b2ebf6d45ada4ad59f16ded7f21d64a809595ba765e922bdcce1190bf5fd6bab2133d0154b6f11d1142b53543f4eaa4184023927d029e9dfc1032b4d1dc41
+  languageName: node
+  linkType: hard
+
 "@radix-ui/react-roving-focus@npm:1.1.10":
   version: 1.1.10
   resolution: "@radix-ui/react-roving-focus@npm:1.1.10"
@@ -5059,6 +5130,21 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 2731089e15477dd5eef98a5757c36113dd932d0c52ff05123cd89f05f0412e95e5b205229185d1cd705cda4a674a838479cce2b3b46ed903f82f5d23d9e3f3c2
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-slot@npm:1.2.4":
+  version: 1.2.4
+  resolution: "@radix-ui/react-slot@npm:1.2.4"
+  dependencies:
+    "@radix-ui/react-compose-refs": 1.1.2
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 6e1cda512f649ca9df8e746a5059c69aa7539b43870ff6def360103590d68d1ea3adf8a216092107b3e6476d55a3d71707e162b5be04574126bcc6fdfffefe6a
   languageName: node
   linkType: hard
 
@@ -7131,6 +7217,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/xlsx@npm:^0.0.36":
+  version: 0.0.36
+  resolution: "@types/xlsx@npm:0.0.36"
+  dependencies:
+    xlsx: "*"
+  checksum: f3fe3325963293bd7e949cbdeb2be21f1cf385ea0ab11c252a5c035c2453c077436c288a27abc80da70a2fd851833aa4e1878045aa7861f07ba84da0c66ac4b1
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 21.0.3
   resolution: "@types/yargs-parser@npm:21.0.3"
@@ -7731,6 +7826,13 @@ __metadata:
   version: 1.2.2
   resolution: "address@npm:1.2.2"
   checksum: ace439960c1e3564d8f523aff23a841904bf33a2a7c2e064f7f60a064194075758b9690e65bd9785692a4ef698a998c57eb74d145881a1cecab8ba658ddb1607
+  languageName: node
+  linkType: hard
+
+"adler-32@npm:~1.3.0":
+  version: 1.3.1
+  resolution: "adler-32@npm:1.3.1"
+  checksum: c7f6b02df64a4392fcf1591862344f56733716a558e97a8b06a553dadeeaec792054512389000f42f371b13d2be5370e056e18db3b573944b595c4cb7742c5c6
   languageName: node
   linkType: hard
 
@@ -8679,6 +8781,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cfb@npm:~1.2.1":
+  version: 1.2.2
+  resolution: "cfb@npm:1.2.2"
+  dependencies:
+    adler-32: ~1.3.0
+    crc-32: ~1.2.0
+  checksum: cfb63a7d630a7fa415c1b25655dca66666584f29c95fb0ee90866ada1a28090857827f2ba70a9a50df28bdce05728ae58d495bce417249f305ef7b3c85840024
+  languageName: node
+  linkType: hard
+
 "chai@npm:^5.2.0":
   version: 5.2.1
   resolution: "chai@npm:5.2.1"
@@ -8976,6 +9088,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"codepage@npm:~1.15.0":
+  version: 1.15.0
+  resolution: "codepage@npm:1.15.0"
+  checksum: 86bdfd8f8fd4d78ace6ddab02a1621cbb4a833686fe886984b4155d99cd0287581d69495774b816ab2f571c4dc851c1595e1dbb8d69bd6dbb5a631ebf317fab0
+  languageName: node
+  linkType: hard
+
 "collapse-white-space@npm:^2.0.0":
   version: 2.1.0
   resolution: "collapse-white-space@npm:2.1.0"
@@ -9263,6 +9382,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"crc-32@npm:~1.2.0, crc-32@npm:~1.2.1":
+  version: 1.2.2
+  resolution: "crc-32@npm:1.2.2"
+  bin:
+    crc32: bin/crc32.njs
+  checksum: ad2d0ad0cbd465b75dcaeeff0600f8195b686816ab5f3ba4c6e052a07f728c3e70df2e3ca9fd3d4484dc4ba70586e161ca5a2334ec8bf5a41bf022a6103ff243
+  languageName: node
+  linkType: hard
+
 "create-jest@npm:^29.7.0":
   version: 29.7.0
   resolution: "create-jest@npm:29.7.0"
@@ -9277,19 +9405,6 @@ __metadata:
   bin:
     create-jest: bin/create-jest.js
   checksum: 1427d49458adcd88547ef6fa39041e1fe9033a661293aa8d2c3aa1b4967cb5bf4f0c00436c7a61816558f28ba2ba81a94d5c962e8022ea9a883978fc8e1f2945
-  languageName: node
-  linkType: hard
-
-"cross-env@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "cross-env@npm:10.0.0"
-  dependencies:
-    "@epic-web/invariant": ^1.0.0
-    cross-spawn: ^7.0.6
-  bin:
-    cross-env: dist/bin/cross-env.js
-    cross-env-shell: dist/bin/cross-env-shell.js
-  checksum: 3ab63968e015e5de56e1a411aff34e4c94536574be85666fa173ffd4bda899891acfd5bd4fd8dfedcb107220908b88c79565df35fd6c848c87ab623ec9888982
   languageName: node
   linkType: hard
 
@@ -11442,6 +11557,13 @@ __metadata:
   version: 0.2.0
   resolution: "forwarded@npm:0.2.0"
   checksum: fd27e2394d8887ebd16a66ffc889dc983fbbd797d5d3f01087c020283c0f019a7d05ee85669383d8e0d216b116d720fc0cef2f6e9b7eb9f4c90c6e0bc7fd28e6
+  languageName: node
+  linkType: hard
+
+"frac@npm:~1.1.2":
+  version: 1.1.2
+  resolution: "frac@npm:1.1.2"
+  checksum: fbfbb28003bb84506dd35e7aad8543c5a358bdc95451d0065b6127d40d2c45106f14221575c3e9ce3ea4bf0bbf1225b73c5d655965c9f4ce44332cbe1b34667d
   languageName: node
   linkType: hard
 
@@ -14064,15 +14186,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"langsmith@npm:^0.3.48":
-  version: 0.3.48
-  resolution: "langsmith@npm:0.3.48"
+"langsmith@npm:^0.3.29, langsmith@npm:^0.3.33, langsmith@npm:^0.3.46":
+  version: 0.3.84
+  resolution: "langsmith@npm:0.3.84"
   dependencies:
     "@types/uuid": ^10.0.0
     chalk: ^4.1.2
     console-table-printer: ^2.12.1
     p-queue: ^6.6.2
-    p-retry: 4
     semver: ^7.6.3
     uuid: ^10.0.0
   peerDependencies:
@@ -14089,7 +14210,7 @@ __metadata:
       optional: true
     openai:
       optional: true
-  checksum: bb535aec6ae05cd8f07bb4f32ccffa06f91793360bcd5045cab1387e52322756c5592dbdcb67e5b5358818da1913958cd63716ce6d4d3e9e016cfd3737bd57fe
+  checksum: 128ad9cf131aa8f6a61153fdd16366926126ebaf42c963ebbeca6c4936bd1b08bbf3e8afc3871e7ac18493a773561d1802deb975d4e9acf381fead99a535a554
   languageName: node
   linkType: hard
 
@@ -16186,13 +16307,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"open-swe@workspace:.":
+"open-swe-memory-optimized@workspace:.":
   version: 0.0.0-use.local
-  resolution: "open-swe@workspace:."
-  dependencies:
-    cross-env: ^10.0.0
-    turbo: ^2.5.0
-    typescript: ^5
+  resolution: "open-swe-memory-optimized@workspace:."
   languageName: unknown
   linkType: soft
 
@@ -18818,6 +18935,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ssf@npm:~0.11.2":
+  version: 0.11.2
+  resolution: "ssf@npm:0.11.2"
+  dependencies:
+    frac: ~1.1.2
+  checksum: 6ecef6ae0a90e67dc4b05bc3cca883e2dffad9773b41124af36ee308884e4a29f98bde66d6c8d2bd1ccf5f860ea4f6c49338bd8d733007fc42ebe02dd5295dcf
+  languageName: node
+  linkType: hard
+
 "ssri@npm:^12.0.0":
   version: 12.0.0
   resolution: "ssri@npm:12.0.0"
@@ -19859,7 +19985,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5, typescript@npm:^5.8.3":
+"typescript@npm:^5.8.3":
   version: 5.8.3
   resolution: "typescript@npm:5.8.3"
   bin:
@@ -19879,7 +20005,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^5#~builtin<compat/typescript>, typescript@patch:typescript@^5.8.3#~builtin<compat/typescript>":
+"typescript@patch:typescript@^5.8.3#~builtin<compat/typescript>":
   version: 5.8.3
   resolution: "typescript@patch:typescript@npm%3A5.8.3#~builtin<compat/typescript>::version=5.8.3&hash=77c9e2"
   bin:
@@ -20792,10 +20918,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"wmf@npm:~1.0.1":
+  version: 1.0.2
+  resolution: "wmf@npm:1.0.2"
+  checksum: d336acb2c76fa868ef006fbb06c4e64c7c1ed5ff77d16c48a273cf1f4d0a44e35df209b8fde28d93dd4a924d652a9c4fc8a92ad57885a5e437df0b0900769e3b
+  languageName: node
+  linkType: hard
+
 "word-wrap@npm:^1.2.5":
   version: 1.2.5
   resolution: "word-wrap@npm:1.2.5"
   checksum: f93ba3586fc181f94afdaff3a6fef27920b4b6d9eaefed0f428f8e07adea2a7f54a5f2830ce59406c8416f033f86902b91eb824072354645eea687dff3691ccb
+  languageName: node
+  linkType: hard
+
+"word@npm:~0.3.0":
+  version: 0.3.0
+  resolution: "word@npm:0.3.0"
+  checksum: f84e7061883380c1bcb0d98bd183b7f2b281688011924af7a96d3ed3ee20aeb12cc59a0451b66e5e57520338a056725ff8e0c07b358c0afecf5488a9557c19fe
   languageName: node
   linkType: hard
 
@@ -20896,6 +21036,23 @@ __metadata:
   dependencies:
     is-wsl: ^3.1.0
   checksum: de4c92187e04c3c27b4478f410a02e81c351dc85efa3447bf1666f34fc80baacd890a6698ec91995631714086992036013286aea3d77e6974020d40a08e00aec
+  languageName: node
+  linkType: hard
+
+"xlsx@npm:*, xlsx@npm:^0.18.5":
+  version: 0.18.5
+  resolution: "xlsx@npm:0.18.5"
+  dependencies:
+    adler-32: ~1.3.0
+    cfb: ~1.2.1
+    codepage: ~1.15.0
+    crc-32: ~1.2.1
+    ssf: ~0.11.2
+    wmf: ~1.0.1
+    word: ~0.3.0
+  bin:
+    xlsx: bin/xlsx.njs
+  checksum: c5774d3c6abdf2db24f33a7b786e305255dac0e41a4e6bf6167c3f8517bfb5bfcb98e8207c39d5105f8304aa7416758da0400a993fb79aaf8e2ea4cfa8801f2e
   languageName: node
   linkType: hard
 
