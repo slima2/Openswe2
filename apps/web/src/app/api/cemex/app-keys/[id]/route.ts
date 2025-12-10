@@ -6,7 +6,7 @@ import { AuditLogger, AuditAction, CemexModule, createAuditMiddleware } from "@/
 const appKeyAudit = createAuditMiddleware(CemexModule.APP_KEYS, "AppKey");
 
 // Mock database - In production, this would use Prisma
-let mockAppKeys = [
+const mockAppKeys = [
   {
     id: "1",
     appName: "CEMEX Authentication Service",
@@ -248,3 +248,4 @@ function maskKeyValue(keyValue: string): string {
   
   return `${start}${middle}${end}`;
 }
+
