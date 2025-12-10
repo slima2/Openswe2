@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCemexAuthenticatedUser, hasImportExportAccess } from "@/lib/cemex-auth";
+import { getCemexAuthenticatedUser, canPerformImportExport } from "@/lib/cemex-auth";
 
 // Excel export functionality for CEMEX Configuration Console
 // Supports exporting parameters, translations, and app keys to Excel format
@@ -320,3 +320,4 @@ async function logExportAction(userId: string, exportType: string, environment?:
     timestamp: new Date().toISOString(),
   });
 }
+
