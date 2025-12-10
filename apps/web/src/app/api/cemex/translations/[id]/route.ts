@@ -131,7 +131,7 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Find translation
     const translation = mockTranslations.find((t) => t.id === id);
@@ -203,5 +203,6 @@ export async function DELETE(
     );
   }
 }
+
 
 
