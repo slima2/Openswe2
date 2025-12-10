@@ -16,7 +16,7 @@ import {
   MaintenanceWindow,
   ExcelFileNameParts,
   CemexPermissions,
-} from "./types";
+} from "./types.js";
 import {
   CEMEX_ROLES,
   CEMEX_ROLE_HIERARCHY,
@@ -25,7 +25,7 @@ import {
   MESSAGE_DURATIONS,
   PARAMETER_TYPES,
   CEMEX_MESSAGES,
-} from "./constants";
+} from "./constants.js";
 
 // Permission utility functions
 export function hasRole(user: CemexUser | null, requiredRoles: CemexRole[]): boolean {
@@ -581,3 +581,4 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
+
