@@ -325,16 +325,6 @@ export interface EnvironmentHierarchy {
   [key: string]: number;
 }
 
-export const ENVIRONMENT_HIERARCHY: EnvironmentHierarchy = {
-  QA: 1,
-  PROD: 2,
-  DEMO: 3,
-  DEV: 3,
-  DEV2: 3,
-  QA2: 3,
-  "PRE-PROD": 3,
-} as const;
-
 // File Naming Convention Types
 export interface ExcelFileNameParts {
   prefix: string;
@@ -405,3 +395,4 @@ export interface CemexEvent<T = any> {
 export interface CemexEventHandler<T = any> {
   (event: CemexEvent<T>): void | Promise<void>;
 }
+
