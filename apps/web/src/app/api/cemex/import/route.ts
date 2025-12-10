@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCemexAuthenticatedUser, hasImportExportAccess } from "@/lib/cemex-auth";
+import { getCemexAuthenticatedUser, canPerformImportExport } from "@/lib/cemex-auth";
 
 // Excel import functionality for CEMEX Configuration Console
 // Supports importing parameters, translations, and app keys from Excel format
@@ -359,3 +359,4 @@ async function logImportAction(
     timestamp: new Date().toISOString(),
   });
 }
+
