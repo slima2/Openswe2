@@ -68,7 +68,7 @@ export function getUserPermissions(user: CemexUser | null): CemexPermissions {
 }
 
 export function getRoleHierarchyLevel(role: CemexRole): number {
-  return CEMEX_ROLE_HIERARCHY[role] || 0;
+  return (CEMEX_ROLE_HIERARCHY as any)[role] || 0;
 }
 
 export function hasHigherOrEqualRole(userRole: CemexRole, requiredRole: CemexRole): boolean {
@@ -581,4 +581,5 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
+
 
