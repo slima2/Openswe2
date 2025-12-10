@@ -91,7 +91,7 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Find maintenance window
     const maintenanceWindow = mockMaintenanceWindows.find((w) => w.id === id);
@@ -178,5 +178,6 @@ export async function DELETE(
     );
   }
 }
+
 
 
