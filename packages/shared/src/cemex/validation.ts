@@ -10,25 +10,23 @@ import {
   CemexEnvironment,
   ParameterType,
   MaintenanceType,
-  TranslationContext,
   ValidationError,
   ValidationResult,
   ConfigurationParameter,
   Translation,
   AppKey,
   MaintenanceWindow,
-} from "./types";
+} from "./types.js";
 import {
   CEMEX_ROLES,
   CEMEX_REGIONS,
   CEMEX_ENVIRONMENTS,
   PARAMETER_TYPES,
   MAINTENANCE_TYPES,
-  TRANSLATION_CONTEXTS,
   SUPPORTED_LANGUAGES,
   VALIDATION_CONSTRAINTS,
   ENVIRONMENT_HIERARCHY,
-} from "./constants";
+} from "./constants.js";
 
 // Base validation schemas
 export const cemexRoleSchema = z.enum([
@@ -596,3 +594,4 @@ export function validateEntity<T>(
     warnings: warnings.length > 0 ? warnings : undefined,
   };
 }
+
