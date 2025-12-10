@@ -239,7 +239,8 @@ export function ParameterForm({
             </Label>
             <Input
               id="paramKey"
-              {...register("paramKey")}
+              value={formData.paramKey}
+              onChange={(e) => handleInputChange("paramKey", e.target.value)}
               placeholder="e.g., MAX_LOGIN_ATTEMPTS"
               className={errors.paramKey || fieldErrors.paramKey ? "border-destructive" : ""}
             />
@@ -249,7 +250,7 @@ export function ParameterForm({
             {(errors.paramKey || fieldErrors.paramKey) && (
               <p className="text-sm text-destructive flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
-                {errors.paramKey?.message || fieldErrors.paramKey}
+                {errors.paramKey || fieldErrors.paramKey}
               </p>
             )}
           </div>
@@ -260,8 +261,8 @@ export function ParameterForm({
               Parameter Type <span className="text-destructive">*</span>
             </Label>
             <Select
-              value={watchedParamType}
-              onValueChange={(value) => setValue("paramType", value as any, { shouldDirty: true })}
+              value={formData.paramType}
+              onValueChange={(value) => handleInputChange("paramType", value)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -394,6 +395,7 @@ export function ParameterForm({
     </Card>
   );
 }
+
 
 
 
