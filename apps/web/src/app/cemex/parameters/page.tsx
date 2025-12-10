@@ -54,14 +54,50 @@ interface Service {
  */
 export default function CemexParametersPage() {
   const { user, canImportExport, canPerformCRUD, hasReadAccess } = useCemexAuth();
-  const [parameters, setParameters] = useState<ConfigurationParameter[]>(mockParameters);
+  const messages = useCemexMessages();
+  
+  // State management
+  const [parameters, setParameters] = useState<ConfigurationParameter[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState<string>("all");
   const [selectedEnvironment, setSelectedEnvironment] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingParameter, setEditingParameter] = useState<ConfigurationParameter | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [parameterToDelete, setParameterToDelete] = useState<string | null>(null);
 
-  // Get unique services for filter
-  const services = Array.from(new Set(parameters.map(p => p.serviceName)));
+  // Load parameters and services on mount
+  useEffect(() => {
+    loadParameters();
+  }, []);
+
+  const loadParameters = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/cemex/parameters", {
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to load parameters");
+      }
+      
+      const data = await response.json();
+      if (data.success) {
+        setParameters(data.data.parameters || []);
+        setServices(data.data.services || []);
+      } else {
+        messages.showError(data.error || "Failed to load parameters");
+      }
+    } catch (error) {
+      console.error("Error loading parameters:", error);
+      messages.showError("Failed to load configuration parameters");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Filter parameters based on search and filters
   const filteredParameters = parameters.filter(param => {
@@ -77,36 +113,101 @@ export default function CemexParametersPage() {
   });
 
   const handleRefresh = () => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    loadParameters();
   };
 
   const handleAddParameter = () => {
-    // TODO: Open add parameter dialog
-    console.log("Add parameter");
+    setEditingParameter(null);
+    setIsFormOpen(true);
   };
 
-  const handleEditParameter = (id: string) => {
-    // TODO: Open edit parameter dialog
-    console.log("Edit parameter:", id);
+  const handleEditParameter = (parameter: ConfigurationParameter) => {
+    setEditingParameter(parameter);
+    setIsFormOpen(true);
   };
 
   const handleDeleteParameter = (id: string) => {
-    // TODO: Open delete confirmation dialog
-    console.log("Delete parameter:", id);
+    setParameterToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!parameterToDelete) return;
+
+    try {
+      const response = await fetch(`/api/cemex/parameters/${parameterToDelete}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        messages.showParameterDeleted();
+        setParameters(prev => prev.filter(p => p.id !== parameterToDelete));
+      } else {
+        messages.showError(data.error || "Failed to delete parameter");
+      }
+    } catch (error) {
+      console.error("Error deleting parameter:", error);
+      messages.showError("Failed to delete parameter");
+    } finally {
+      setDeleteConfirmOpen(false);
+      setParameterToDelete(null);
+    }
+  };
+
+  const handleFormSubmit = async (formData: any) => {
+    try {
+      const url = editingParameter 
+        ? "/api/cemex/parameters" 
+        : "/api/cemex/parameters";
+      
+      const method = editingParameter ? "PUT" : "POST";
+      const payload = editingParameter 
+        ? { ...formData, id: editingParameter.id }
+        : formData;
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        messages.showParameterSaved();
+        setIsFormOpen(false);
+        setEditingParameter(null);
+        loadParameters(); // Reload to get updated data
+      } else {
+        if (data.code === "DUPLICATE_PARAMETER") {
+          messages.showDuplicateError();
+        } else if (data.code === "VALIDATION_ERROR") {
+          messages.showValidationError(data.error);
+        } else {
+          messages.showError(data.error || "Failed to save parameter");
+        }
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      // Error handling is done above, just re-throw for form component
+      throw error;
+    }
   };
 
   const handleExport = () => {
-    // TODO: Implement export functionality
-    console.log("Export parameters");
+    // TODO: Implement export functionality in next task
+    messages.showSuccess("Export functionality will be implemented in the next phase");
   };
 
   const handleImport = () => {
-    // TODO: Implement import functionality
-    console.log("Import parameters");
+    // TODO: Implement import functionality in next task
+    messages.showSuccess("Import functionality will be implemented in the next phase");
   };
 
   return (
@@ -399,5 +500,6 @@ export default function CemexParametersPage() {
     </CemexLayout>
   );
 }
+
 
 
