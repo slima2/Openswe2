@@ -147,7 +147,7 @@ export async function GET(
 // DELETE - Delete app key by ID
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user and check CRUD permissions
@@ -248,5 +248,6 @@ function maskKeyValue(keyValue: string): string {
   
   return `${start}${middle}${end}`;
 }
+
 
 
