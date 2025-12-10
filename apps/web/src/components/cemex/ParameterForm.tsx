@@ -280,12 +280,11 @@ export function ParameterForm({
           {/* Parameter Value */}
           <div className="space-y-2">
             <Label htmlFor="paramValue">Parameter Value</Label>
-            {watchedParamType === "JSON" ? (
+            {formData.paramType === "JSON" ? (
               <Textarea
                 id="paramValue"
-                {...register("paramValue", {
-                  validate: (value) => validateParameterValue(value || "", watchedParamType),
-                })}
+                value={formData.paramValue || ""}
+                onChange={(e) => handleInputChange("paramValue", e.target.value)}
                 placeholder='{"key": "value"}'
                 rows={4}
                 className={errors.paramValue ? "border-destructive" : ""}
@@ -293,13 +292,12 @@ export function ParameterForm({
             ) : (
               <Input
                 id="paramValue"
-                {...register("paramValue", {
-                  validate: (value) => validateParameterValue(value || "", watchedParamType),
-                })}
+                value={formData.paramValue || ""}
+                onChange={(e) => handleInputChange("paramValue", e.target.value)}
                 placeholder={
-                  watchedParamType === "INTEGER" ? "123" :
-                  watchedParamType === "DECIMAL" ? "123.45" :
-                  watchedParamType === "BOOLEAN" ? "true" :
+                  formData.paramType === "INTEGER" ? "123" :
+                  formData.paramType === "DECIMAL" ? "123.45" :
+                  formData.paramType === "BOOLEAN" ? "true" :
                   "Enter parameter value"
                 }
                 className={errors.paramValue ? "border-destructive" : ""}
@@ -308,7 +306,7 @@ export function ParameterForm({
             {errors.paramValue && (
               <p className="text-sm text-destructive flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
-                {errors.paramValue.message}
+                {errors.paramValue}
               </p>
             )}
           </div>
@@ -395,6 +393,7 @@ export function ParameterForm({
     </Card>
   );
 }
+
 
 
 
