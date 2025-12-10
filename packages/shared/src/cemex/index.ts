@@ -4,16 +4,16 @@
  */
 
 // Export all types
-export * from "./types";
+export * from "./types.js";
 
 // Export all constants
-export * from "./constants";
+export * from "./constants.js";
 
 // Export all validation functions and schemas
-export * from "./validation";
+export * from "./validation.js";
 
 // Export all utility functions
-export * from "./utils";
+export * from "./utils.js";
 
 // Re-export commonly used items for convenience
 export {
@@ -309,3 +309,4 @@ const CEMEX = {
 };
 
 export default CEMEX;
+
