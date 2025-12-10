@@ -135,7 +135,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Find maintenance window
     const windowIndex = mockMaintenanceWindows.findIndex((w) => w.id === id);
@@ -178,6 +178,7 @@ export async function DELETE(
     );
   }
 }
+
 
 
 
