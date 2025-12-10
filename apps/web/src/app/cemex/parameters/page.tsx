@@ -501,10 +501,65 @@ export default function CemexParametersPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Parameter Form Dialog */}
+        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {editingParameter ? "Edit Parameter" : "Add New Parameter"}
+              </DialogTitle>
+              <DialogDescription>
+                {editingParameter 
+                  ? "Modify the configuration parameter details"
+                  : "Create a new configuration parameter for the selected service"
+                }
+              </DialogDescription>
+            </DialogHeader>
+            <ParameterForm
+              parameter={editingParameter || undefined}
+              services={services}
+              onSubmit={handleFormSubmit}
+              onCancel={() => {
+                setIsFormOpen(false);
+                setEditingParameter(null);
+              }}
+              isLoading={isLoading}
+              mode={editingParameter ? "edit" : "create"}
+            />
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Parameter Deletion</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this configuration parameter? This action cannot be undone.
+                {parameterToDelete && (
+                  <div className="mt-2 p-2 bg-muted rounded text-sm">
+                    <strong>Parameter:</strong> {parameters.find(p => p.id === parameterToDelete)?.paramKey}
+                  </div>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDelete}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Delete Parameter
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </CemexLayout>
   );
 }
+
 
 
 
