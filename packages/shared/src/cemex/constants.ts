@@ -3,7 +3,7 @@
  * Common constants used across frontend and backend components
  */
 
-import { CemexRole, CemexRegion, CemexEnvironment, ParameterType, MaintenanceType, TranslationContext } from "./types";
+import { CemexRole, CemexRegion, CemexEnvironment, ParameterType, MaintenanceType, TranslationContext } from "./types.js";
 
 // CEMEX Roles
 export const CEMEX_ROLES: Record<string, CemexRole> = {
@@ -412,3 +412,4 @@ export const DEFAULTS = {
   NOTIFY_USERS: true,
   PAGE_SIZE: 20,
 } as const;
+
