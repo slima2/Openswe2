@@ -72,7 +72,7 @@ let mockMaintenanceWindows = [
 // GET - Retrieve single maintenance window by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user
@@ -178,3 +178,4 @@ export async function DELETE(
     );
   }
 }
+
