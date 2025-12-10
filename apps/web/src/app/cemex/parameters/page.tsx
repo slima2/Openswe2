@@ -201,14 +201,10 @@ export default function CemexParametersPage() {
     }
   };
 
-  const handleExport = () => {
-    // TODO: Implement export functionality in next task
-    messages.showSuccess("Export functionality will be implemented in the next phase");
-  };
-
-  const handleImport = () => {
-    // TODO: Implement import functionality in next task
-    messages.showSuccess("Import functionality will be implemented in the next phase");
+  const handleImportComplete = () => {
+    // Refresh parameters list after import
+    fetchParameters();
+    messages.showSuccess("Parameters imported successfully");
   };
 
   return (
@@ -560,6 +556,7 @@ export default function CemexParametersPage() {
     </CemexLayout>
   );
 }
+
 
 
 
