@@ -109,7 +109,7 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Find app key
     const appKey = mockAppKeys.find((key) => key.id === id);
@@ -248,6 +248,7 @@ function maskKeyValue(keyValue: string): string {
   
   return `${start}${middle}${end}`;
 }
+
 
 
 
