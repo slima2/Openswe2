@@ -53,7 +53,7 @@ export {
   CemexValidationError,
   CemexAuthenticationError,
   CemexAuthorizationError,
-} from "./types";
+} from "./types.js";
 
 export {
   // Role constants
@@ -116,7 +116,7 @@ export {
   
   // Default values
   DEFAULTS,
-} from "./constants";
+} from "./constants.js";
 
 export {
   // Validation schemas
@@ -147,7 +147,7 @@ export {
   validateUniqueTranslation,
   validateUniqueAppKey,
   validateEntity,
-} from "./validation";
+} from "./validation.js";
 
 export {
   // Permission utilities
@@ -213,7 +213,7 @@ export {
   deepClone,
   debounce,
   throttle,
-} from "./utils";
+} from "./utils.js";
 
 // Default export for convenience
 const CEMEX = {
@@ -309,4 +309,5 @@ const CEMEX = {
 };
 
 export default CEMEX;
+
 
