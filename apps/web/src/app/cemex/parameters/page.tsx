@@ -212,6 +212,11 @@ export default function CemexParametersPage() {
 
   return (
     <CemexLayout>
+      <CemexMessageSystem 
+        messages={messages.messages} 
+        onDismiss={messages.removeMessage} 
+      />
+      
       <div className="space-y-6">
         {/* Page Header */}
         <div className="flex items-center justify-between">
@@ -500,6 +505,7 @@ export default function CemexParametersPage() {
     </CemexLayout>
   );
 }
+
 
 
 
