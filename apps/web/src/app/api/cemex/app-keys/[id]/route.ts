@@ -166,7 +166,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Find app key
     const appKeyIndex = mockAppKeys.findIndex((key) => key.id === id);
@@ -248,6 +248,7 @@ function maskKeyValue(keyValue: string): string {
   
   return `${start}${middle}${end}`;
 }
+
 
 
 
