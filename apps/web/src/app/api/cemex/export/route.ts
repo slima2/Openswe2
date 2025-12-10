@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (!hasImportExportAccess(user.cemexRole)) {
+    if (!canPerformImportExport(user.cemexRole)) {
       return NextResponse.json(
         { 
           error: "Access denied", 
@@ -320,4 +320,5 @@ async function logExportAction(userId: string, exportType: string, environment?:
     timestamp: new Date().toISOString(),
   });
 }
+
 
