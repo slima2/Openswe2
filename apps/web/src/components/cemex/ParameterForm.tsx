@@ -318,8 +318,8 @@ export function ParameterForm({
                 Environment <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={watchedEnvironment}
-                onValueChange={(value) => setValue("environment", value as any, { shouldDirty: true })}
+                value={formData.environment}
+                onValueChange={(value) => handleInputChange("environment", value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -334,7 +334,7 @@ export function ParameterForm({
                   <SelectItem value="DEMO">DEMO - Demonstration</SelectItem>
                 </SelectContent>
               </Select>
-              {watchedEnvironment === "PROD" && (
+              {formData.environment === "PROD" && (
                 <p className="text-xs text-destructive flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" />
                   Production environment - changes affect live systems
@@ -346,14 +346,15 @@ export function ParameterForm({
               <Label htmlFor="region">Region</Label>
               <Input
                 id="region"
-                {...register("region")}
+                value={formData.region || ""}
+                onChange={(e) => handleInputChange("region", e.target.value)}
                 placeholder="e.g., AME, EUR"
                 className={errors.region ? "border-destructive" : ""}
               />
               {errors.region && (
                 <p className="text-sm text-destructive flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" />
-                  {errors.region.message}
+                  {errors.region}
                 </p>
               )}
             </div>
@@ -363,8 +364,8 @@ export function ParameterForm({
           <div className="flex items-center space-x-2">
             <Switch
               id="isActive"
-              checked={watch("isActive")}
-              onCheckedChange={(checked) => setValue("isActive", checked, { shouldDirty: true })}
+              checked={formData.isActive}
+              onCheckedChange={(checked) => handleInputChange("isActive", checked)}
             />
             <Label htmlFor="isActive">Parameter is active</Label>
           </div>
@@ -393,6 +394,7 @@ export function ParameterForm({
     </Card>
   );
 }
+
 
 
 
