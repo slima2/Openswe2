@@ -4273,6 +4273,7 @@ __metadata:
     "@types/react-dom": ^19.0.3
     "@types/react-syntax-highlighter": ^15.5.13
     "@types/uuid": ^10.0.0
+    "@types/xlsx": ^0.0.36
     autoprefixer: ^10.4.20
     class-variance-authority: ^0.7.1
     clsx: ^2.1.1
@@ -7145,6 +7146,15 @@ __metadata:
   version: 9.0.8
   resolution: "@types/uuid@npm:9.0.8"
   checksum: b8c60b7ba8250356b5088302583d1704a4e1a13558d143c549c408bf8920535602ffc12394ede77f8a8083511b023704bc66d1345792714002bfa261b17c5275
+  languageName: node
+  linkType: hard
+
+"@types/xlsx@npm:^0.0.36":
+  version: 0.0.36
+  resolution: "@types/xlsx@npm:0.0.36"
+  dependencies:
+    xlsx: "*"
+  checksum: f3fe3325963293bd7e949cbdeb2be21f1cf385ea0ab11c252a5c035c2453c077436c288a27abc80da70a2fd851833aa4e1878045aa7861f07ba84da0c66ac4b1
   languageName: node
   linkType: hard
 
@@ -20961,7 +20971,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xlsx@npm:^0.18.5":
+"xlsx@npm:*, xlsx@npm:^0.18.5":
   version: 0.18.5
   resolution: "xlsx@npm:0.18.5"
   dependencies:
