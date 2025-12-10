@@ -198,15 +198,15 @@ export function ParameterForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+        <form onSubmit={handleFormSubmit} className="space-y-6">
           {/* Service Selection */}
           <div className="space-y-2">
             <Label htmlFor="serviceId">
               Service <span className="text-destructive">*</span>
             </Label>
             <Select
-              value={watch("serviceId")}
-              onValueChange={(value) => setValue("serviceId", value, { shouldDirty: true })}
+              value={formData.serviceId}
+              onValueChange={(value) => handleInputChange("serviceId", value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a service..." />
@@ -227,7 +227,7 @@ export function ParameterForm({
             {(errors.serviceId || fieldErrors.serviceId) && (
               <p className="text-sm text-destructive flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
-                {errors.serviceId?.message || fieldErrors.serviceId}
+                {errors.serviceId || fieldErrors.serviceId}
               </p>
             )}
           </div>
@@ -394,6 +394,7 @@ export function ParameterForm({
     </Card>
   );
 }
+
 
 
 
