@@ -152,8 +152,32 @@ export const maintenanceWindowSchema = z.object({
   path: ["endTime"],
 });
 
-export const updateMaintenanceWindowSchema = maintenanceWindowSchema.partial().extend({
+export const updateMaintenanceWindowSchema = z.object({
   id: z.string().min(1, "Maintenance window ID is required"),
+  title: z
+    .string()
+    .min(VALIDATION_CONSTRAINTS.MAINTENANCE_TITLE.MIN_LENGTH, "Title is required")
+    .max(VALIDATION_CONSTRAINTS.MAINTENANCE_TITLE.MAX_LENGTH, "Title too long")
+    .optional(),
+  description: z.string().optional(),
+  startTime: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid start time").optional(),
+  endTime: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid end time").optional(),
+  environment: cemexEnvironmentSchema.optional(),
+  region: z.string().optional(),
+  affectedServices: z.array(z.string()).optional(),
+  maintenanceType: maintenanceTypeSchema.optional(),
+  isActive: z.boolean().optional(),
+  notifyUsers: z.boolean().optional(),
+}).refine((data) => {
+  if (data.startTime && data.endTime) {
+    const start = new Date(data.startTime);
+    const end = new Date(data.endTime);
+    return end > start;
+  }
+  return true;
+}, {
+  message: "End time must be after start time",
+  path: ["endTime"],
 });
 
 // Service validation
@@ -594,4 +618,5 @@ export function validateEntity<T>(
     warnings: warnings.length > 0 ? warnings : undefined,
   };
 }
+
 
