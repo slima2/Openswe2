@@ -44,7 +44,7 @@ export interface AuditLogEntry {
 }
 
 // Mock audit log storage - In production, this would use Prisma
-let mockAuditLogs: (AuditLogEntry & { id: string; createdAt: string })[] = [
+const mockAuditLogs: (AuditLogEntry & { id: string; createdAt: string })[] = [
   {
     id: "1",
     userId: "user-1",
@@ -561,3 +561,4 @@ export function createAuditMiddleware(
     },
   };
 }
+
