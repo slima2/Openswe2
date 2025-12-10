@@ -156,7 +156,7 @@ export async function GET(
 // DELETE - Delete translation by ID
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user and check CRUD permissions
@@ -203,4 +203,5 @@ export async function DELETE(
     );
   }
 }
+
 
