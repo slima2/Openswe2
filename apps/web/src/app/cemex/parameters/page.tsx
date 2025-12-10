@@ -349,32 +349,11 @@ export default function CemexParametersPage() {
           </CardContent>
         </Card>
 
-        {/* Admin Actions */}
-        {canImportExport() && (
-          <Card className="border-destructive/20">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Badge variant="destructive" className="text-xs">Admin Only</Badge>
-                Environment Import/Export
-              </CardTitle>
-              <CardDescription>
-                Import and export configuration parameters by environment
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4">
-                <Button variant="outline" onClick={handleExport}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Env. Export
-                </Button>
-                <Button variant="outline" onClick={handleImport}>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Env. Import
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Excel Import/Export */}
+        <ExcelImportExport 
+          module="parameters" 
+          onImportComplete={handleImportComplete}
+        />
 
         {/* Parameters Table */}
         <Card>
@@ -556,6 +535,7 @@ export default function CemexParametersPage() {
     </CemexLayout>
   );
 }
+
 
 
 
