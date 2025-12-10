@@ -111,10 +111,26 @@ export function ParameterForm({
     }
   };
 
-  const handleFormSubmit = async (data: ParameterFormData) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     try {
+      // Validate form data
+      const validationResult = parameterFormSchema.safeParse(formData);
+      if (!validationResult.success) {
+        const newErrors: Record<string, string> = {};
+        validationResult.error.errors.forEach((error) => {
+          if (error.path.length > 0) {
+            newErrors[error.path[0] as string] = error.message;
+          }
+        });
+        setErrors(newErrors);
+        return;
+      }
+
       setFieldErrors({});
-      await onSubmit(data);
+      setErrors({});
+      await onSubmit(validationResult.data);
     } catch (error: any) {
       // Handle validation errors from API
       if (error.details && Array.isArray(error.details)) {
@@ -374,5 +390,6 @@ export function ParameterForm({
     </Card>
   );
 }
+
 
 
