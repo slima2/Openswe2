@@ -72,33 +72,23 @@ export function ParameterForm({
 }: ParameterFormProps) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    setValue,
-    watch,
-    reset,
-  } = useForm<ParameterFormData>({
-    resolver: zodResolver(parameterFormSchema),
-    defaultValues: {
-      serviceId: parameter?.serviceId || "",
-      paramKey: parameter?.paramKey || "",
-      paramValue: parameter?.paramValue || "",
-      paramType: (parameter?.paramType as any) || "STRING",
-      environment: (parameter?.environment as any) || "QA",
-      region: parameter?.region || "",
-      isActive: parameter?.isActive ?? true,
-    },
+  const [formData, setFormData] = useState<ParameterFormData>({
+    serviceId: parameter?.serviceId || "",
+    paramKey: parameter?.paramKey || "",
+    paramValue: parameter?.paramValue || "",
+    paramType: (parameter?.paramType as any) || "STRING",
+    environment: (parameter?.environment as any) || "QA",
+    region: parameter?.region || "",
+    isActive: parameter?.isActive ?? true,
   });
 
-  const watchedParamType = watch("paramType");
-  const watchedEnvironment = watch("environment");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isDirty, setIsDirty] = useState(false);
 
   // Reset form when parameter changes
   useEffect(() => {
     if (parameter) {
-      reset({
+      setFormData({
         serviceId: parameter.serviceId,
         paramKey: parameter.paramKey,
         paramValue: parameter.paramValue || "",
@@ -107,8 +97,19 @@ export function ParameterForm({
         region: parameter.region || "",
         isActive: parameter.isActive,
       });
+      setIsDirty(false);
+      setErrors({});
     }
-  }, [parameter, reset]);
+  }, [parameter]);
+
+  const updateFormData = (field: keyof ParameterFormData, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    setIsDirty(true);
+    // Clear field error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: "" }));
+    }
+  };
 
   const handleFormSubmit = async (data: ParameterFormData) => {
     try {
@@ -373,4 +374,5 @@ export function ParameterForm({
     </Card>
   );
 }
+
 
