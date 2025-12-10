@@ -450,7 +450,7 @@ export default function CemexParametersPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleEditParameter(param.id)}
+                                onClick={() => handleEditParameter(param)}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -505,6 +505,7 @@ export default function CemexParametersPage() {
     </CemexLayout>
   );
 }
+
 
 
 
