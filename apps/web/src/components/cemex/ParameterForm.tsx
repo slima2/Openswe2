@@ -175,6 +175,10 @@ export function ParameterForm({
     }
   };
 
+  const handleInputChange = (field: keyof ParameterFormData, value: any) => {
+    updateFormData(field, value);
+  };
+
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader>
@@ -390,6 +394,7 @@ export function ParameterForm({
     </Card>
   );
 }
+
 
 
 
