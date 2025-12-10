@@ -77,7 +77,7 @@ export function hasHigherOrEqualRole(userRole: CemexRole, requiredRole: CemexRol
 
 // Environment utility functions
 export function getEnvironmentHierarchyLevel(environment: CemexEnvironment): number {
-  return ENVIRONMENT_HIERARCHY[environment] || 999;
+  return (ENVIRONMENT_HIERARCHY as any)[environment] || 999;
 }
 
 export function canImportToEnvironment(
@@ -581,5 +581,6 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
+
 
 
