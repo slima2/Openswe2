@@ -301,8 +301,8 @@ export function validateEnvironmentHierarchy(
 ): ValidationResult {
   const errors: ValidationError[] = [];
 
-  const fileLevel = ENVIRONMENT_HIERARCHY[fileEnvironment];
-  const currentLevel = ENVIRONMENT_HIERARCHY[currentEnvironment];
+  const fileLevel = (ENVIRONMENT_HIERARCHY as any)[fileEnvironment];
+  const currentLevel = (ENVIRONMENT_HIERARCHY as any)[currentEnvironment];
 
   if (fileLevel === undefined) {
     errors.push({
@@ -618,5 +618,6 @@ export function validateEntity<T>(
     warnings: warnings.length > 0 ? warnings : undefined,
   };
 }
+
 
 
