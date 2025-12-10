@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getCemexAuthenticatedUser, hasReadAccess, canPerformCRUD } from "@/lib/cemex-auth";
+import { AuditLogger, AuditAction, CemexModule, createAuditMiddleware } from "@/lib/audit-logger";
+
+// Create audit middleware for parameters
+const parameterAudit = createAuditMiddleware(CemexModule.PARAMETERS, "ConfigurationParameter");
 
 // Configuration Parameter validation schema
 const configParameterSchema = z.object({
@@ -346,3 +350,4 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
