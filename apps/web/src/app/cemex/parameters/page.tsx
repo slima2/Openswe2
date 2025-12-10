@@ -42,51 +42,11 @@ interface ConfigurationParameter {
   updatedAt: string;
 }
 
-// Mock data for demonstration
-const mockParameters: ConfigurationParameter[] = [
-  {
-    id: "1",
-    serviceId: "service-1",
-    serviceName: "User Authentication Service",
-    paramKey: "MAX_LOGIN_ATTEMPTS",
-    paramValue: "5",
-    paramType: "INTEGER",
-    environment: "PROD",
-    region: "AME",
-    isActive: true,
-    createdBy: "admin.user",
-    createdAt: "2024-01-15T10:30:00Z",
-    updatedAt: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: "2",
-    serviceId: "service-1",
-    serviceName: "User Authentication Service",
-    paramKey: "SESSION_TIMEOUT",
-    paramValue: "3600",
-    paramType: "INTEGER",
-    environment: "PROD",
-    region: "AME",
-    isActive: true,
-    createdBy: "tech.user",
-    createdAt: "2024-01-14T14:20:00Z",
-    updatedAt: "2024-01-14T14:20:00Z",
-  },
-  {
-    id: "3",
-    serviceId: "service-2",
-    serviceName: "Email Notification Service",
-    paramKey: "SMTP_HOST",
-    paramValue: "smtp.cemex.com",
-    paramType: "STRING",
-    environment: "PROD",
-    region: "AME",
-    isActive: true,
-    createdBy: "admin.user",
-    createdAt: "2024-01-13T09:15:00Z",
-    updatedAt: "2024-01-13T09:15:00Z",
-  },
-];
+interface Service {
+  id: string;
+  serviceName: string;
+  serviceCode: string;
+}
 
 /**
  * CEMEX Parameters Configuration Page
@@ -439,4 +399,5 @@ export default function CemexParametersPage() {
     </CemexLayout>
   );
 }
+
 
