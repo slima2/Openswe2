@@ -111,9 +111,133 @@ model AuditLog {
   details    Json?
   createdAt  DateTime @default(now())
 
+  // CEMEX-specific audit fields
+  module     String?
+  tableName  String?
+  recordId   String?
+  oldValues  Json?
+  newValues  Json?
+  ipAddress  String?
+  userAgent  String?
+
   // Relations
   user User @relation(fields: [userId], references: [id])
 
   @@map("audit_logs")
 }
+
+// CEMEX Configuration Console Models
+
+model Service {
+  id          String   @id @default(cuid())
+  serviceName String   @db.VarChar(100)
+  serviceCode String   @unique @db.VarChar(50)
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  configurationParameters ConfigurationParameter[]
+
+  @@map("services")
+}
+
+model ConfigurationParameter {
+  id          String   @id @default(cuid())
+  serviceId   String
+  paramKey    String   @db.VarChar(255)
+  paramValue  String?  @db.Text
+  paramType   String?  @db.VarChar(50)
+  environment String   @db.VarChar(20) // QA, PROD, DEMO, DEV, DEV2, QA2, PRE-PROD
+  region      String?  @db.VarChar(10) // US, UK, etc.
+  isActive    Boolean  @default(true)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  creator User    @relation(fields: [createdBy], references: [id])
+
+  // Constraints
+  @@unique([serviceId, paramKey, environment, region], name: "unique_param")
+  @@index([serviceId])
+  @@index([environment, region])
+  @@map("configuration_parameters")
+}
+
+model Language {
+  id           String   @id @default(cuid())
+  languageCode String   @unique @db.VarChar(5)
+  languageName String   @db.VarChar(100)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  // Relations
+  translations Translation[]
+
+  @@map("languages")
+}
+
+model Translation {
+  id               String   @id @default(cuid())
+  translationKey   String   @db.VarChar(255)
+  languageCode     String   @db.VarChar(5)
+  translationValue String   @db.Text
+  context          String?  @db.VarChar(100)
+  isActive         Boolean  @default(true)
+  createdBy        String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  language Language @relation(fields: [languageCode], references: [languageCode], onDelete: Cascade)
+  creator  User     @relation(fields: [createdBy], references: [id])
+
+  // Constraints
+  @@unique([translationKey, languageCode, context], name: "unique_translation")
+  @@index([translationKey, languageCode])
+  @@map("translations")
+}
+
+model AppKey {
+  id          String   @id @default(cuid())
+  appName     String   @db.VarChar(100)
+  keyName     String   @db.VarChar(255)
+  keyValue    String?  @db.Text
+  environment String?  @db.VarChar(20)
+  region      String?  @db.VarChar(10)
+  isActive    Boolean  @default(true)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creator User @relation(fields: [createdBy], references: [id])
+
+  // Constraints
+  @@unique([appName, keyName, environment, region], name: "unique_app_key")
+  @@map("app_keys")
+}
+
+model MaintenanceWindow {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  startTime   DateTime
+  endTime     DateTime
+  environment String?  @db.VarChar(20)
+  region      String?  @db.VarChar(10)
+  isActive    Boolean  @default(true)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creator User @relation(fields: [createdBy], references: [id])
+
+  @@map("maintenance_windows")
+}
+
 
